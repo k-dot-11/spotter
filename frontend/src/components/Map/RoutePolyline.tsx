@@ -2,6 +2,14 @@ import React from 'react';
 import { Polyline } from 'react-leaflet';
 import { RouteSummary } from '../../types/trip';
 
+export const getRouteColor = (route: RouteSummary): string => {
+  if (route.has_no_travel) return '#d32f2f'; // Red (No Travel)
+  if (route.is_recommended) return '#2e7d32'; // Forest Green (Safest / Recommended)
+  if (route.rank === 2) return '#1976d2'; // Blue (Option 2)
+  if (route.rank === 3) return '#7b1fa2'; // Purple (Option 3)
+  return '#0288d1';
+};
+
 interface RoutePolylineProps {
   route: RouteSummary;
   isSelected: boolean;
@@ -18,39 +26,35 @@ export const RoutePolyline: React.FC<RoutePolylineProps> = ({
 
   if (positions.length === 0) return null;
 
-  const isRecommended = route.is_recommended;
-  const hasNoTravel = route.has_no_travel;
-
-  // Colors matching standard Material colors
-  const mainColor = isRecommended ? '#2e7d32' : hasNoTravel ? '#d32f2f' : '#1976d2';
+  const routeColor = getRouteColor(route);
 
   return (
     <>
-      {/* Background shadow/border for crisp visibility against map */}
+      {/* Background outline border for selected route */}
       {isSelected && (
         <Polyline
           positions={positions}
           pathOptions={{
             color: '#ffffff',
-            weight: 8,
-            opacity: 0.9,
+            weight: 9,
+            opacity: 0.95,
             lineCap: 'round',
             lineJoin: 'round',
           }}
         />
       )}
 
-      {/* Main Vector Road Polyline */}
+      {/* Main Vector Road Polyline: colored for all routes, bold for selected */}
       <Polyline
         positions={positions}
         eventHandlers={{
           click: () => onSelect(route.route_id),
         }}
         pathOptions={{
-          color: isSelected ? mainColor : '#757575',
-          weight: isSelected ? 5 : 3.5,
-          opacity: isSelected ? 1.0 : 0.5,
-          dashArray: isSelected ? undefined : '5, 8',
+          color: routeColor,
+          weight: isSelected ? 6 : 4,
+          opacity: isSelected ? 1.0 : 0.65,
+          dashArray: isSelected ? undefined : '6, 6',
           lineCap: 'round',
           lineJoin: 'round',
         }}

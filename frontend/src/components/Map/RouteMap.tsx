@@ -87,6 +87,17 @@ export const RouteMap: React.FC<RouteMapProps> = React.memo(({
     [routes, selectedRouteId]
   );
 
+  // Sort routes so unselected routes render first (bottom), and selected route renders last (on top)
+  const sortedRoutes = useMemo(() => {
+    return [...routes].sort((a, b) => {
+      const aSelected = a.route_id === selectedRoute?.route_id;
+      const bSelected = b.route_id === selectedRoute?.route_id;
+      if (aSelected) return 1;
+      if (bSelected) return -1;
+      return 0;
+    });
+  }, [routes, selectedRoute]);
+
   // Derive active heatmap points [lat, lon, intensity] in-memory for 60fps performance
   const activeHeatmapPoints = useMemo(() => {
     if (!corridorHeatmap || !corridorHeatmap.points) return [];
@@ -138,8 +149,8 @@ export const RouteMap: React.FC<RouteMapProps> = React.memo(({
           />
         )}
 
-        {/* 2. Top Layer: Vector Route Polylines */}
-        {routes.map((route) => (
+        {/* 2. Top Layer: Vector Route Polylines (Selected route rendered on top) */}
+        {sortedRoutes.map((route) => (
           <RoutePolyline
             key={route.route_id}
             route={route}

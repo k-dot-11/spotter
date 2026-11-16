@@ -33,10 +33,10 @@ export const CheckpointMarkers: React.FC<CheckpointMarkersProps> = ({ checkpoint
             center={[cp.lat, cp.lon]}
             radius={isNoTravel ? 9 : isHazard ? 8 : 6}
             pathOptions={{
-              color: '#ffffff',
-              weight: 2,
+              color: '#1e293b',
+              weight: 1.5,
               fillColor: cp.risk.risk_color,
-              fillOpacity: 0.95,
+              fillOpacity: 1.0,
             }}
           >
             <Popup>

@@ -6,6 +6,7 @@ import TimerIcon from '@mui/icons-material/Timer';
 import RouteIcon from '@mui/icons-material/Route';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { RouteSummary } from '../../types/trip';
+import { getRouteColor } from '../Map/RoutePolyline';
 
 interface RouteCardListProps {
   routes: RouteSummary[];
@@ -39,6 +40,8 @@ export const RouteCardList: React.FC<RouteCardListProps> = ({
         const sevPct = ((route.severe_miles || 0) / total) * 100;
         const noTravelPct = ((route.no_travel_miles || 0) / total) * 100;
 
+        const routeColor = getRouteColor(route);
+
         return (
           <Card
             key={route.route_id}
@@ -46,13 +49,10 @@ export const RouteCardList: React.FC<RouteCardListProps> = ({
             onClick={() => onSelectRoute(route.route_id)}
             sx={{
               cursor: 'pointer',
+              borderLeft: `5px solid ${routeColor}`,
               borderWidth: isSelected ? 2 : 1,
-              borderColor: isSelected
-                ? isRecommended
-                  ? 'success.main'
-                  : 'primary.main'
-                : 'divider',
-              boxShadow: isSelected ? 2 : 0,
+              borderColor: isSelected ? routeColor : 'divider',
+              boxShadow: isSelected ? 3 : 0,
               bgcolor: isSelected ? 'action.selected' : 'background.paper',
               '&:hover': {
                 bgcolor: 'action.hover',
@@ -84,6 +84,7 @@ export const RouteCardList: React.FC<RouteCardListProps> = ({
                       label={`Option ${route.rank}`}
                       size="small"
                       variant="outlined"
+                      sx={{ borderColor: routeColor, color: routeColor, fontWeight: 600 }}
                     />
                   )}
                 </Box>
