@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Box, ThemeProvider, CssBaseline, Alert, Snackbar } from '@mui/material';
 import { darkTheme } from './theme';
 import { Header } from './components/Header';
@@ -18,6 +18,8 @@ export const App: React.FC = () => {
   const [heatmapOpacity, setHeatmapOpacity] = useState<number>(0.6);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const routes = useMemo(() => tripData?.routes || [], [tripData]);
 
   const handleTripSubmit = async (params: {
     origin: string;
@@ -64,15 +66,15 @@ export const App: React.FC = () => {
         {/* Top Header */}
         <Header />
 
-        {/* Main Cockpit Split Layout */}
-        <Box sx={{ display: 'flex', flex: 1, height: 'calc(100vh - 52px)', overflow: 'hidden' }}>
-          {/* Left Sidebar: Form & Route Cards */}
+        {/* Main Cockpit Split Layout: Fixed Left Sidebar + Dedicated Fixed Right Map Container */}
+        <Box sx={{ display: 'flex', flex: 1, height: 'calc(100vh - 52px)', width: '100vw', overflow: 'hidden' }}>
+          {/* Left Sidebar: Fixed Width Container (440px) */}
           <Box
+            component="aside"
             sx={{
-              width: { xs: '100%', md: 440 },
-              minWidth: { md: 420 },
-              maxWidth: { md: 460 },
-              flexShrink: 0,
+              width: 440,
+              minWidth: 440,
+              maxWidth: 440,
               height: '100%',
               overflowY: 'auto',
               p: 2.5,
@@ -81,8 +83,9 @@ export const App: React.FC = () => {
               display: 'flex',
               flexDirection: 'column',
               gap: 2.5,
+              flexShrink: 0,
               zIndex: 10,
-              boxShadow: '4px 0 24px rgba(0, 0, 0, 0.4)',
+              boxShadow: '4px 0 24px rgba(0, 0, 0, 0.5)',
               '&::-webkit-scrollbar': { width: 6 },
               '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 3 },
             }}
@@ -93,17 +96,27 @@ export const App: React.FC = () => {
             {/* Evaluated Route Cards */}
             {tripData && (
               <RouteCardList
-                routes={tripData.routes}
+                routes={routes}
                 selectedRouteId={selectedRouteId}
                 onSelectRoute={setSelectedRouteId}
               />
             )}
           </Box>
 
-          {/* Right Area: Interactive GIS Map */}
-          <Box sx={{ flex: 1, height: '100%', position: 'relative', overflow: 'hidden' }}>
+          {/* Right Area: Dedicated Fixed Map Container */}
+          <Box
+            component="main"
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              height: '100%',
+              position: 'relative',
+              overflow: 'hidden',
+              backgroundColor: '#090d16',
+            }}
+          >
             <RouteMap
-              routes={tripData?.routes || []}
+              routes={routes}
               selectedRouteId={selectedRouteId}
               onSelectRoute={setSelectedRouteId}
               corridorHeatmap={tripData?.corridor_heatmap}

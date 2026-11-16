@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Box } from '@mui/material';
@@ -25,13 +25,18 @@ interface RouteMapProps {
   onOpacityChange: (opacity: number) => void;
 }
 
-// Automatically fits map viewport to the extent of all routes
+// Adjusts map bounds ONCE when a new trip is loaded, preventing tile cancellation / black box tearing
 const MapBoundsAdjuster: React.FC<{ routes: RouteSummary[] }> = ({ routes }) => {
   const map = useMap();
+  const lastKeyRef = useRef<string>('');
 
   useEffect(() => {
-    map.invalidateSize();
     if (!routes || routes.length === 0) return;
+
+    // Unique signature for this route set (only refit when actual routes change, NOT on route selection/hover/slider)
+    const currentKey = routes.map((r) => r.route_id).join('|');
+    if (currentKey === lastKeyRef.current) return;
+    lastKeyRef.current = currentKey;
 
     const allPoints: [number, number][] = [];
     routes.forEach((r) => {
@@ -42,17 +47,27 @@ const MapBoundsAdjuster: React.FC<{ routes: RouteSummary[] }> = ({ routes }) => 
 
     if (allPoints.length > 0) {
       const bounds = L.latLngBounds(allPoints);
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 150);
+      // animate: false prevents in-flight tile aborts and black square tearing
+      map.fitBounds(bounds, { padding: [60, 60], maxZoom: 12, animate: false });
     }
   }, [routes, map]);
 
   return null;
 };
 
-export const RouteMap: React.FC<RouteMapProps> = ({
+// Ensures map sizing is synchronized with fixed container once mounted
+const MapInitialSizer: React.FC = () => {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 120);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+};
+
+export const RouteMap: React.FC<RouteMapProps> = React.memo(({
   routes,
   selectedRouteId,
   onSelectRoute,
@@ -90,14 +105,14 @@ export const RouteMap: React.FC<RouteMapProps> = ({
     });
   }, [corridorHeatmap, forecastHour, heatmapMetric]);
 
-  // Default initial center (US Midwest / National)
-  const defaultCenter: [number, number] = [39.8283, -98.5795];
+  // Initial center focused on the Chicago-Indianapolis corridor
+  const defaultCenter: [number, number] = [40.825, -86.89];
 
   return (
     <Box sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
       <MapContainer
         center={defaultCenter}
-        zoom={5}
+        zoom={7}
         scrollWheelZoom={true}
         style={{ width: '100%', height: '100%', background: '#090d16' }}
       >
@@ -106,14 +121,21 @@ export const RouteMap: React.FC<RouteMapProps> = ({
           attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
           url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
           maxZoom={16}
+          keepBuffer={6}
+          updateWhenZooming={false}
+          updateWhenIdle={false}
         />
         {/* State borders and city labels */}
         <TileLayer
           attribution=""
           url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
           maxZoom={16}
+          keepBuffer={6}
+          updateWhenZooming={false}
+          updateWhenIdle={false}
         />
 
+        <MapInitialSizer />
         <MapBoundsAdjuster routes={routes} />
 
         {/* 1. Middle Layer: Weather Heatmap */}
@@ -159,4 +181,4 @@ export const RouteMap: React.FC<RouteMapProps> = ({
       )}
     </Box>
   );
-};
+});

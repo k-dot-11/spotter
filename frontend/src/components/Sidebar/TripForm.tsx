@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -52,47 +52,44 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
   const [loadingOrigin, setLoadingOrigin] = useState<boolean>(false);
   const [loadingDest, setLoadingDest] = useState<boolean>(false);
 
-  // Debounced search for Origin
-  const handleOriginSearch = useCallback(async (query: string) => {
+  const originTimerRef = React.useRef<any>(null);
+  const destTimerRef = React.useRef<any>(null);
+
+  // Debounced search for Origin (only on user typing)
+  const handleOriginSearch = useCallback((query: string) => {
+    if (originTimerRef.current) clearTimeout(originTimerRef.current);
     if (!query || query.length < 2) return;
-    setLoadingOrigin(true);
-    try {
-      const results = await geocodeCities(query, 5);
-      setOriginOptions(results.map((r: GeocodeResultItem) => r.display_name));
-    } catch {
-      // Ignore network errors in autocomplete
-    } finally {
-      setLoadingOrigin(false);
-    }
+
+    originTimerRef.current = setTimeout(async () => {
+      setLoadingOrigin(true);
+      try {
+        const results = await geocodeCities(query, 5);
+        setOriginOptions(results.map((r: GeocodeResultItem) => r.display_name));
+      } catch {
+        // Ignore network errors in autocomplete
+      } finally {
+        setLoadingOrigin(false);
+      }
+    }, 350);
   }, []);
 
-  // Debounced search for Destination
-  const handleDestSearch = useCallback(async (query: string) => {
+  // Debounced search for Destination (only on user typing)
+  const handleDestSearch = useCallback((query: string) => {
+    if (destTimerRef.current) clearTimeout(destTimerRef.current);
     if (!query || query.length < 2) return;
-    setLoadingDest(true);
-    try {
-      const results = await geocodeCities(query, 5);
-      setDestinationOptions(results.map((r: GeocodeResultItem) => r.display_name));
-    } catch {
-      // Ignore network errors in autocomplete
-    } finally {
-      setLoadingDest(false);
-    }
+
+    destTimerRef.current = setTimeout(async () => {
+      setLoadingDest(true);
+      try {
+        const results = await geocodeCities(query, 5);
+        setDestinationOptions(results.map((r: GeocodeResultItem) => r.display_name));
+      } catch {
+        // Ignore network errors in autocomplete
+      } finally {
+        setLoadingDest(false);
+      }
+    }, 350);
   }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (origin && origin.length >= 2) handleOriginSearch(origin);
-    }, 350);
-    return () => clearTimeout(timer);
-  }, [origin, handleOriginSearch]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (destination && destination.length >= 2) handleDestSearch(destination);
-    }, 350);
-    return () => clearTimeout(timer);
-  }, [destination, handleDestSearch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,7 +144,12 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
         freeSolo
         options={originOptions}
         value={origin}
-        onInputChange={(_, newInputValue) => setOrigin(newInputValue)}
+        onInputChange={(_, newInputValue, reason) => {
+          setOrigin(newInputValue);
+          if (reason === 'input') {
+            handleOriginSearch(newInputValue);
+          }
+        }}
         loading={loadingOrigin}
         renderInput={(params) => (
           <TextField
@@ -178,7 +180,12 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
         freeSolo
         options={destinationOptions}
         value={destination}
-        onInputChange={(_, newInputValue) => setDestination(newInputValue)}
+        onInputChange={(_, newInputValue, reason) => {
+          setDestination(newInputValue);
+          if (reason === 'input') {
+            handleDestSearch(newInputValue);
+          }
+        }}
         loading={loadingDest}
         renderInput={(params) => (
           <TextField
