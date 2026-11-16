@@ -29,36 +29,19 @@ export const RoutePolyline: React.FC<RoutePolylineProps> = ({
   const routeColor = getRouteColor(route);
 
   return (
-    <>
-      {/* Background outline border for selected route */}
-      {isSelected && (
-        <Polyline
-          positions={positions}
-          pathOptions={{
-            color: '#ffffff',
-            weight: 9,
-            opacity: 0.95,
-            lineCap: 'round',
-            lineJoin: 'round',
-          }}
-        />
-      )}
-
-      {/* Main Vector Road Polyline: colored for all routes, bold for selected */}
-      <Polyline
-        positions={positions}
-        eventHandlers={{
-          click: () => onSelect(route.route_id),
-        }}
-        pathOptions={{
-          color: routeColor,
-          weight: isSelected ? 6 : 4,
-          opacity: isSelected ? 1.0 : 0.65,
-          dashArray: isSelected ? undefined : '6, 6',
-          lineCap: 'round',
-          lineJoin: 'round',
-        }}
-      />
-    </>
+    <Polyline
+      positions={positions}
+      eventHandlers={{
+        click: () => onSelect(route.route_id),
+      }}
+      pathOptions={{
+        color: routeColor,
+        weight: isSelected ? 6 : 4,
+        opacity: isSelected ? 1.0 : 0.65,
+        dashArray: isSelected ? undefined : '6, 6',
+        lineCap: 'round',
+        lineJoin: 'round',
+      }}
+    />
   );
 };

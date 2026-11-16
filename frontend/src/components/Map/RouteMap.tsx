@@ -150,14 +150,17 @@ export const RouteMap: React.FC<RouteMapProps> = React.memo(({
         )}
 
         {/* 2. Top Layer: Vector Route Polylines (Selected route rendered on top) */}
-        {sortedRoutes.map((route) => (
-          <RoutePolyline
-            key={route.route_id}
-            route={route}
-            isSelected={route.route_id === selectedRoute?.route_id}
-            onSelect={onSelectRoute}
-          />
-        ))}
+        {sortedRoutes.map((route) => {
+          const isSelected = route.route_id === selectedRoute?.route_id;
+          return (
+            <RoutePolyline
+              key={`${route.route_id}-${isSelected ? 'active' : 'inactive'}-${route.total_distance_miles}`}
+              route={route}
+              isSelected={isSelected}
+              onSelect={onSelectRoute}
+            />
+          );
+        })}
 
         {/* 3. Checkpoint Markers on the Selected Route */}
         {selectedRoute && <CheckpointMarkers checkpoints={selectedRoute.checkpoints} />}
