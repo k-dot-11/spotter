@@ -97,10 +97,11 @@ export const RouteMap: React.FC<RouteMapProps> = ({
         scrollWheelZoom={true}
         style={{ width: '100%', height: '100%', background: '#090d16' }}
       >
-        {/* CartoDB Voyager / Dark Basemap (100% Free, Zero Key, Clean road labels) */}
+        {/* Official OpenStreetMap Standard Basemap (100% Free, Zero API Keys, Globally Open) */}
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
         />
 
         <MapBoundsAdjuster routes={routes} />
