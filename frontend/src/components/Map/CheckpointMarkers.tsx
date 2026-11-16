@@ -29,12 +29,13 @@ export const CheckpointMarkers: React.FC<CheckpointMarkersProps> = ({ checkpoint
 
         return (
           <CircleMarker
+            pane="checkpointsPane"
             key={`cp-${cp.index}-${cp.distance_from_start_miles}`}
             center={[cp.lat, cp.lon]}
             radius={isNoTravel ? 9 : isHazard ? 8 : 6}
             pathOptions={{
-              color: '#1e293b',
-              weight: 1.5,
+              color: '#ffffff',
+              weight: 2,
               fillColor: cp.risk.risk_color,
               fillOpacity: 1.0,
             }}

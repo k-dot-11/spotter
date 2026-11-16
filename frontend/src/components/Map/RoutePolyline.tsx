@@ -23,6 +23,7 @@ export const RoutePolyline: React.FC<RoutePolylineProps> = ({
 
   return (
     <Polyline
+      pane="routesPane"
       positions={positions}
       eventHandlers={{
         click: () => onSelect(route.route_id),

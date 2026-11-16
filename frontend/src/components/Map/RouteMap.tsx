@@ -55,6 +55,22 @@ const MapBoundsAdjuster: React.FC<{ routes: RouteSummary[] }> = ({ routes }) => 
   return null;
 };
 
+// Dedicated Z-index Panes: ensures Checkpoints (620) always render above Routes (450) and Heatmap (400)
+const MapPanes: React.FC = () => {
+  const map = useMap();
+  useEffect(() => {
+    if (!map.getPane('routesPane')) {
+      const routesPane = map.createPane('routesPane');
+      routesPane.style.zIndex = '450';
+    }
+    if (!map.getPane('checkpointsPane')) {
+      const checkpointsPane = map.createPane('checkpointsPane');
+      checkpointsPane.style.zIndex = '620';
+    }
+  }, [map]);
+  return null;
+};
+
 // Ensures map sizing is synchronized with fixed container once mounted
 const MapInitialSizer: React.FC = () => {
   const map = useMap();
@@ -137,6 +153,7 @@ export const RouteMap: React.FC<RouteMapProps> = React.memo(({
           updateWhenIdle={false}
         />
 
+        <MapPanes />
         <MapInitialSizer />
         <MapBoundsAdjuster routes={routes} />
 
