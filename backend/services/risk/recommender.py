@@ -8,42 +8,43 @@ Applies the 4-tier preference hierarchy from the Spotter Assessment:
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
+from typing import Any
+
 from .rules import RiskLevel
-from .evaluator import CheckpointRiskResult
 
 
 @dataclass
 class RouteRiskSummary:
     """Aggregated risk metrics for a single route."""
+
     route_id: str
     route_name: str
     total_distance_miles: float
     duration_seconds: float
     duration_formatted: str
-    
+
     # Miles breakdown per risk level
     low_miles: float = 0.0
     moderate_miles: float = 0.0
     high_miles: float = 0.0
     severe_miles: float = 0.0
     no_travel_miles: float = 0.0
-    
+
     # Aggregated scores
     average_risk: float = 1.0
     max_risk_level: RiskLevel = RiskLevel.LOW
     has_no_travel: bool = False
     is_safe_to_travel: bool = True
-    
+
     # Recommendation metadata
     is_recommended: bool = False
     rank: int = 0
     recommendation_reason: str = ""
-    
-    # Detailed checkpoint list
-    checkpoints: List[Dict[str, Any]] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    # Detailed checkpoint list
+    checkpoints: list[dict[str, Any]] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
         return {
             "route_id": self.route_id,
             "route_name": self.route_name,
@@ -80,7 +81,7 @@ def aggregate_route_risk(
     route_name: str,
     total_distance_miles: float,
     duration_seconds: float,
-    evaluated_checkpoints: List[Dict[str, Any]]
+    evaluated_checkpoints: list[dict[str, Any]],
 ) -> RouteRiskSummary:
     """
     Computes risk mileage breakdown, weighted average risk, and flags.
@@ -98,7 +99,7 @@ def aggregate_route_risk(
         seg_miles = cp.get("segment_miles", 0.0)
         risk_score = cp.get("risk_score", 1)
         risk_level = RiskLevel(risk_score)
-        
+
         if risk_level > max_risk:
             max_risk = risk_level
 
@@ -134,11 +135,11 @@ def aggregate_route_risk(
         max_risk_level=max_risk,
         has_no_travel=has_no_travel,
         is_safe_to_travel=not has_no_travel,
-        checkpoints=evaluated_checkpoints
+        checkpoints=evaluated_checkpoints,
     )
 
 
-def rank_and_recommend_routes(routes: List[RouteRiskSummary]) -> List[RouteRiskSummary]:
+def rank_and_recommend_routes(routes: list[RouteRiskSummary]) -> list[RouteRiskSummary]:
     """
     Ranks routes based on the 4-tier preference hierarchy from the PDF:
     1. Fewest Severe miles
@@ -154,11 +155,11 @@ def rank_and_recommend_routes(routes: List[RouteRiskSummary]) -> List[RouteRiskS
     # Sorting key implementing exact hierarchy
     def sort_key(r: RouteRiskSummary):
         return (
-            r.has_no_travel,           # False (0) before True (1)
+            r.has_no_travel,  # False (0) before True (1)
             round(r.severe_miles, 2),  # 1. Fewest Severe miles
-            round(r.high_miles, 2),    # 2. Fewest High miles
+            round(r.high_miles, 2),  # 2. Fewest High miles
             round(r.average_risk, 3),  # 3. Lowest average risk
-            round(r.duration_seconds, 1) # 4. Shortest travel time
+            round(r.duration_seconds, 1),  # 4. Shortest travel time
         )
 
     sorted_routes = sorted(routes, key=sort_key)
@@ -180,7 +181,7 @@ def rank_and_recommend_routes(routes: List[RouteRiskSummary]) -> List[RouteRiskS
                     reasons.append("Zero Severe risk miles")
                 else:
                     reasons.append(f"Lowest Severe exposure ({r.severe_miles:.1f} mi)")
-                
+
                 reasons.append(f"Avg Risk: {r.average_risk:.2f}")
                 reasons.append(f"Travel Time: {r.duration_formatted}")
                 r.recommendation_reason = " | ".join(reasons)
@@ -190,9 +191,13 @@ def rank_and_recommend_routes(routes: List[RouteRiskSummary]) -> List[RouteRiskS
             if r.has_no_travel:
                 diff_reasons.append(f"Contains {r.no_travel_miles:.1f} mi of No Travel conditions")
             if r.severe_miles > sorted_routes[0].severe_miles:
-                diff_reasons.append(f"+{r.severe_miles - sorted_routes[0].severe_miles:.1f} mi Severe risk")
+                diff_reasons.append(
+                    f"+{r.severe_miles - sorted_routes[0].severe_miles:.1f} mi Severe risk"
+                )
             if r.high_miles > sorted_routes[0].high_miles:
-                diff_reasons.append(f"+{r.high_miles - sorted_routes[0].high_miles:.1f} mi High risk")
+                diff_reasons.append(
+                    f"+{r.high_miles - sorted_routes[0].high_miles:.1f} mi High risk"
+                )
             r.recommendation_reason = "; ".join(diff_reasons) if diff_reasons else f"Rank #{r.rank}"
 
     return sorted_routes

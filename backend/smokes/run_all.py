@@ -9,9 +9,11 @@ Runs:
 
 import sys
 import time
+
 from test_geocoding_nominatim import test_nominatim_geocoding
 from test_routing_osrm import test_osrm_routing
 from test_weather_open_meteo import test_open_meteo_weather
+
 
 def main():
     print("=" * 60)
@@ -43,10 +45,11 @@ def main():
         print(f"🎉 ALL SMOKE TESTS PASSED SUCCESSFULLY! Total time: {total_duration:.2f}s")
         print("All free third-party APIs are live, accessible, and returning expected data.")
     else:
-        print(f"⚠️ SOME SMOKE TESTS FAILED. Please review the errors above.")
+        print("⚠️ SOME SMOKE TESTS FAILED. Please review the errors above.")
     print("=" * 60)
 
     sys.exit(0 if all_passed else 1)
+
 
 if __name__ == "__main__":
     main()

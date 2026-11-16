@@ -3,20 +3,21 @@ Checkpoint Risk Evaluator.
 Evaluates weather conditions and load weight to determine overall checkpoint risk.
 """
 
-from dataclasses import dataclass, asdict
-from typing import List, Optional
+from dataclasses import dataclass
+
 from .rules import (
     RiskLevel,
-    classify_wind_risk,
+    apply_load_weight_rules,
     classify_rain_risk,
     classify_snow_risk,
-    apply_load_weight_rules,
+    classify_wind_risk,
 )
 
 
 @dataclass
 class CheckpointRiskResult:
     """Detailed risk assessment for a single checkpoint."""
+
     overall_risk: RiskLevel
     risk_score: int
     risk_label: str
@@ -26,7 +27,7 @@ class CheckpointRiskResult:
     snow_risk: RiskLevel
     primary_hazard: str
     load_escalation_applied: bool
-    escalation_reason: Optional[str]
+    escalation_reason: str | None
     is_safe: bool
 
     def to_dict(self):
@@ -57,9 +58,7 @@ def evaluate_checkpoint_risk(
     """
     raw_wind_risk = classify_wind_risk(wind_mph)
     adjusted_wind_risk, escalation_reason = apply_load_weight_rules(
-        wind_mph=wind_mph,
-        weight_lbs=weight_lbs,
-        base_wind_risk=raw_wind_risk
+        wind_mph=wind_mph, weight_lbs=weight_lbs, base_wind_risk=raw_wind_risk
     )
     rain_risk = classify_rain_risk(rain_in_per_hr)
     snow_risk = classify_snow_risk(snow_in_per_hr)
@@ -68,7 +67,7 @@ def evaluate_checkpoint_risk(
     max_level = max(adjusted_wind_risk, rain_risk, snow_risk)
 
     # Determine primary contributing hazards
-    hazards: List[str] = []
+    hazards: list[str] = []
     if adjusted_wind_risk == max_level and max_level > RiskLevel.LOW:
         hazards.append(f"Wind ({wind_mph:.1f} mph)")
     if rain_risk == max_level and max_level > RiskLevel.LOW:

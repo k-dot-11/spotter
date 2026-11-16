@@ -1,12 +1,13 @@
 import unittest
+
+from services.risk.evaluator import evaluate_checkpoint_risk
 from services.risk.rules import (
     RiskLevel,
-    classify_wind_risk,
+    apply_load_weight_rules,
     classify_rain_risk,
     classify_snow_risk,
-    apply_load_weight_rules,
+    classify_wind_risk,
 )
-from services.risk.evaluator import evaluate_checkpoint_risk
 
 
 class TestRiskThresholdRules(unittest.TestCase):
@@ -82,32 +83,44 @@ class TestRiskThresholdRules(unittest.TestCase):
 
     def test_load_weight_rules(self):
         # 1. >= 55 mph -> No Travel for any load
-        risk, reason = apply_load_weight_rules(wind_mph=56.0, weight_lbs=10000, base_wind_risk=RiskLevel.NO_TRAVEL)
+        risk, reason = apply_load_weight_rules(
+            wind_mph=56.0, weight_lbs=10000, base_wind_risk=RiskLevel.NO_TRAVEL
+        )
         self.assertEqual(risk, RiskLevel.NO_TRAVEL)
         self.assertIn(">= 55 mph", reason)
 
-        risk, reason = apply_load_weight_rules(wind_mph=55.0, weight_lbs=70000, base_wind_risk=RiskLevel.NO_TRAVEL)
+        risk, reason = apply_load_weight_rules(
+            wind_mph=55.0, weight_lbs=70000, base_wind_risk=RiskLevel.NO_TRAVEL
+        )
         self.assertEqual(risk, RiskLevel.NO_TRAVEL)
 
         # 2. 45–54 mph + > 30,000 lb -> No Travel
         # Below threshold: 30,000 lb remains Severe
-        risk, reason = apply_load_weight_rules(wind_mph=48.0, weight_lbs=30000, base_wind_risk=RiskLevel.SEVERE)
+        risk, reason = apply_load_weight_rules(
+            wind_mph=48.0, weight_lbs=30000, base_wind_risk=RiskLevel.SEVERE
+        )
         self.assertEqual(risk, RiskLevel.SEVERE)
         self.assertIsNone(reason)
 
         # Above threshold: 30,001 lb escalates to No Travel
-        risk, reason = apply_load_weight_rules(wind_mph=48.0, weight_lbs=30001, base_wind_risk=RiskLevel.SEVERE)
+        risk, reason = apply_load_weight_rules(
+            wind_mph=48.0, weight_lbs=30001, base_wind_risk=RiskLevel.SEVERE
+        )
         self.assertEqual(risk, RiskLevel.NO_TRAVEL)
         self.assertIn("> 30,000 lb", reason)
 
         # 3. 35–44 mph + > 40,000 lb -> Severe
         # Below threshold: 40,000 lb remains High
-        risk, reason = apply_load_weight_rules(wind_mph=38.0, weight_lbs=40000, base_wind_risk=RiskLevel.HIGH)
+        risk, reason = apply_load_weight_rules(
+            wind_mph=38.0, weight_lbs=40000, base_wind_risk=RiskLevel.HIGH
+        )
         self.assertEqual(risk, RiskLevel.HIGH)
         self.assertIsNone(reason)
 
         # Above threshold: 40,001 lb escalates to Severe
-        risk, reason = apply_load_weight_rules(wind_mph=38.0, weight_lbs=42000, base_wind_risk=RiskLevel.HIGH)
+        risk, reason = apply_load_weight_rules(
+            wind_mph=38.0, weight_lbs=42000, base_wind_risk=RiskLevel.HIGH
+        )
         self.assertEqual(risk, RiskLevel.SEVERE)
         self.assertIn("> 40,000 lb", reason)
 
@@ -117,10 +130,7 @@ class TestCheckpointEvaluator(unittest.TestCase):
 
     def test_calm_conditions(self):
         result = evaluate_checkpoint_risk(
-            wind_mph=10.0,
-            rain_in_per_hr=0.02,
-            snow_in_per_hr=0.0,
-            weight_lbs=25000
+            wind_mph=10.0, rain_in_per_hr=0.02, snow_in_per_hr=0.0, weight_lbs=25000
         )
         self.assertEqual(result.overall_risk, RiskLevel.LOW)
         self.assertEqual(result.risk_score, 1)
@@ -130,10 +140,7 @@ class TestCheckpointEvaluator(unittest.TestCase):
     def test_dominant_hazard_selection(self):
         # Wind is Moderate (28 mph), Rain is High (0.35 in/hr), Snow is Low
         result = evaluate_checkpoint_risk(
-            wind_mph=28.0,
-            rain_in_per_hr=0.35,
-            snow_in_per_hr=0.0,
-            weight_lbs=25000
+            wind_mph=28.0, rain_in_per_hr=0.35, snow_in_per_hr=0.0, weight_lbs=25000
         )
         self.assertEqual(result.overall_risk, RiskLevel.HIGH)
         self.assertEqual(result.risk_score, 3)
@@ -143,10 +150,7 @@ class TestCheckpointEvaluator(unittest.TestCase):
         # Wind is 38 mph (normally High), Rain is Low, Snow is Low
         # Load is 45,000 lb (> 40k), so wind escalates to Severe -> overall becomes Severe!
         result = evaluate_checkpoint_risk(
-            wind_mph=38.0,
-            rain_in_per_hr=0.0,
-            snow_in_per_hr=0.0,
-            weight_lbs=45000
+            wind_mph=38.0, rain_in_per_hr=0.0, snow_in_per_hr=0.0, weight_lbs=45000
         )
         self.assertEqual(result.overall_risk, RiskLevel.SEVERE)
         self.assertEqual(result.risk_score, 4)
@@ -156,10 +160,7 @@ class TestCheckpointEvaluator(unittest.TestCase):
     def test_no_travel_flagging(self):
         # Extreme snow > 3.0 in/hr
         result = evaluate_checkpoint_risk(
-            wind_mph=15.0,
-            rain_in_per_hr=0.0,
-            snow_in_per_hr=3.5,
-            weight_lbs=30000
+            wind_mph=15.0, rain_in_per_hr=0.0, snow_in_per_hr=3.5, weight_lbs=30000
         )
         self.assertEqual(result.overall_risk, RiskLevel.NO_TRAVEL)
         self.assertEqual(result.risk_score, 5)

@@ -6,7 +6,9 @@ Requirements: Returns GeoJSON coordinates, distance in meters, duration in secon
 """
 
 import time
+
 import requests
+
 
 def test_osrm_routing():
     # Chicago, IL to Indianapolis, IN
@@ -21,20 +23,20 @@ def test_osrm_routing():
         "geometries": "geojson",
         "alternatives": "true",
         "steps": "true",
-        "annotations": "duration,distance"
+        "annotations": "duration,distance",
     }
-    headers = {
-        "User-Agent": "SpotterTruckRouting/1.0"
-    }
+    headers = {"User-Agent": "SpotterTruckRouting/1.0"}
 
     start = time.time()
     response = requests.get(url, params=params, headers=headers, timeout=15)
     duration = time.time() - start
 
-    assert response.status_code == 200, f"Expected 200 OK, got {response.status_code}: {response.text}"
+    assert response.status_code == 200, (
+        f"Expected 200 OK, got {response.status_code}: {response.text}"
+    )
     data = response.json()
     assert data.get("code") == "Ok", f"OSRM returned error code: {data.get('code')}"
-    
+
     routes = data.get("routes", [])
     assert len(routes) >= 1, "No routes returned by OSRM"
 
@@ -57,6 +59,7 @@ def test_osrm_routing():
     print(f"   Primary duration: {duration_hours:.1f} hours ({duration_seconds:.0f}s)")
     print(f"   Geometry: {len(coordinates)} road coordinate waypoints")
     return True
+
 
 if __name__ == "__main__":
     test_osrm_routing()

@@ -1,10 +1,3 @@
-from .rules import (
-    RiskLevel,
-    classify_wind_risk,
-    classify_rain_risk,
-    classify_snow_risk,
-    apply_load_weight_rules,
-)
 from .evaluator import (
     CheckpointRiskResult,
     evaluate_checkpoint_risk,
@@ -12,8 +5,15 @@ from .evaluator import (
 from .recommender import (
     RouteRiskSummary,
     aggregate_route_risk,
-    rank_and_recommend_routes,
     format_duration,
+    rank_and_recommend_routes,
+)
+from .rules import (
+    RiskLevel,
+    apply_load_weight_rules,
+    classify_rain_risk,
+    classify_snow_risk,
+    classify_wind_risk,
 )
 
 __all__ = [

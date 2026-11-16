@@ -6,17 +6,14 @@ Requirements: Valid User-Agent header, returns lat/lon for city/address queries.
 """
 
 import time
+
 import requests
+
 
 def test_nominatim_geocoding():
     url = "https://nominatim.openstreetmap.org/search"
     query = "Chicago, IL"
-    params = {
-        "q": query,
-        "format": "json",
-        "limit": 1,
-        "addressdetails": 1
-    }
+    params = {"q": query, "format": "json", "limit": 1, "addressdetails": 1}
     headers = {
         "User-Agent": "SpotterTruckRouting/1.0 (assessment-evaluation; contact: dev@spotter.local)"
     }
@@ -25,7 +22,9 @@ def test_nominatim_geocoding():
     response = requests.get(url, params=params, headers=headers, timeout=10)
     duration = time.time() - start
 
-    assert response.status_code == 200, f"Expected 200 OK, got {response.status_code}: {response.text}"
+    assert response.status_code == 200, (
+        f"Expected 200 OK, got {response.status_code}: {response.text}"
+    )
     data = response.json()
     assert isinstance(data, list), f"Expected list response, got {type(data)}"
     assert len(data) > 0, "No geocoding results returned"
@@ -43,6 +42,7 @@ def test_nominatim_geocoding():
     print(f"   Query: '{query}' -> ({lat:.4f}, {lon:.4f})")
     print(f"   Name: {display_name}")
     return True
+
 
 if __name__ == "__main__":
     test_nominatim_geocoding()

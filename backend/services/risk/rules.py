@@ -4,7 +4,6 @@ Based on Spotter Full Stack Assessment Specification.
 """
 
 from enum import IntEnum
-from typing import Optional, Tuple
 
 
 class RiskLevel(IntEnum):
@@ -16,6 +15,7 @@ class RiskLevel(IntEnum):
     4: Severe
     5: No Travel
     """
+
     LOW = 1
     MODERATE = 2
     HIGH = 3
@@ -37,11 +37,11 @@ class RiskLevel(IntEnum):
     def color(self) -> str:
         """Hex color code for map pins and UI badges."""
         colors = {
-            RiskLevel.LOW: "#22c55e",       # Green
+            RiskLevel.LOW: "#22c55e",  # Green
             RiskLevel.MODERATE: "#eab308",  # Yellow
-            RiskLevel.HIGH: "#f97316",      # Orange
-            RiskLevel.SEVERE: "#ef4444",    # Red
-            RiskLevel.NO_TRAVEL: "#7f1d1d", # Dark Burgundy / Crimson
+            RiskLevel.HIGH: "#f97316",  # Orange
+            RiskLevel.SEVERE: "#ef4444",  # Red
+            RiskLevel.NO_TRAVEL: "#7f1d1d",  # Dark Burgundy / Crimson
         }
         return colors[self]
 
@@ -119,10 +119,8 @@ def classify_snow_risk(snow_in_per_hr: float) -> RiskLevel:
 
 
 def apply_load_weight_rules(
-    wind_mph: float,
-    weight_lbs: float,
-    base_wind_risk: RiskLevel
-) -> Tuple[RiskLevel, Optional[str]]:
+    wind_mph: float, weight_lbs: float, base_wind_risk: RiskLevel
+) -> tuple[RiskLevel, str | None]:
     """
     Applies truck cargo load rules:
     - >= 55 mph -> No Travel for any load
@@ -137,10 +135,16 @@ def apply_load_weight_rules(
 
     # 45–54 mph + > 30,000 lb -> No Travel
     if 45.0 <= wind_mph < 55.0 and weight_lbs > 30000:
-        return RiskLevel.NO_TRAVEL, f"Wind ({wind_mph:.1f} mph) + Weight ({weight_lbs:,.0f} lb > 30,000 lb) escalates to No Travel"
+        return (
+            RiskLevel.NO_TRAVEL,
+            f"Wind ({wind_mph:.1f} mph) + Weight ({weight_lbs:,.0f} lb > 30,000 lb) escalates to No Travel",
+        )
 
     # 35–44 mph + > 40,000 lb -> Severe
     if 35.0 <= wind_mph < 45.0 and weight_lbs > 40000:
-        return RiskLevel.SEVERE, f"Wind ({wind_mph:.1f} mph) + Heavy Weight ({weight_lbs:,.0f} lb > 40,000 lb) escalates to Severe"
+        return (
+            RiskLevel.SEVERE,
+            f"Wind ({wind_mph:.1f} mph) + Heavy Weight ({weight_lbs:,.0f} lb > 40,000 lb) escalates to Severe",
+        )
 
     return base_wind_risk, None
