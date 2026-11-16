@@ -1,5 +1,6 @@
-from .base import BaseGeocodingService, GeocodeResult
+from .base import BaseGeocodingService
 from .nominatim import NominatimGeocodingService
+from .schemas import GeocodeResult
 
 __all__ = [
     "BaseGeocodingService",

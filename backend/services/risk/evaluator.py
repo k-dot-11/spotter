@@ -3,47 +3,13 @@ Checkpoint Risk Evaluator.
 Evaluates weather conditions and load weight to determine overall checkpoint risk.
 """
 
-from dataclasses import dataclass
-
 from .rules import (
-    RiskLevel,
     apply_load_weight_rules,
     classify_rain_risk,
     classify_snow_risk,
     classify_wind_risk,
 )
-
-
-@dataclass
-class CheckpointRiskResult:
-    """Detailed risk assessment for a single checkpoint."""
-
-    overall_risk: RiskLevel
-    risk_score: int
-    risk_label: str
-    risk_color: str
-    wind_risk: RiskLevel
-    rain_risk: RiskLevel
-    snow_risk: RiskLevel
-    primary_hazard: str
-    load_escalation_applied: bool
-    escalation_reason: str | None
-    is_safe: bool
-
-    def to_dict(self):
-        return {
-            "overall_risk": self.overall_risk.name,
-            "risk_score": self.risk_score,
-            "risk_label": self.risk_label,
-            "risk_color": self.risk_color,
-            "wind_risk": self.wind_risk.name,
-            "rain_risk": self.rain_risk.name,
-            "snow_risk": self.snow_risk.name,
-            "primary_hazard": self.primary_hazard,
-            "load_escalation_applied": self.load_escalation_applied,
-            "escalation_reason": self.escalation_reason,
-            "is_safe": self.is_safe,
-        }
+from .schemas import CheckpointRiskResult, RiskLevel
 
 
 def evaluate_checkpoint_risk(

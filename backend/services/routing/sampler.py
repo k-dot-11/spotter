@@ -3,36 +3,11 @@ Spatial Polyline Interpolator and Checkpoint Sampler.
 Samples route coordinates every 10 / 25 / 50 miles, attaching accurate arrival ETAs.
 """
 
-from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any
 
 from services.common.geo import haversine_distance_miles
 
-
-@dataclass
-class Checkpoint:
-    """A sampled checkpoint along a route."""
-
-    index: int
-    lat: float
-    lon: float
-    distance_from_start_miles: float
-    segment_miles: float
-    eta: datetime
-    eta_iso: str
-    elapsed_seconds: float
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "index": self.index,
-            "lat": round(self.lat, 5),
-            "lon": round(self.lon, 5),
-            "distance_from_start_miles": round(self.distance_from_start_miles, 1),
-            "segment_miles": round(self.segment_miles, 1),
-            "eta_iso": self.eta_iso,
-            "elapsed_seconds": round(self.elapsed_seconds, 1),
-        }
+from .schemas import Checkpoint
 
 
 def sample_checkpoints_along_polyline(

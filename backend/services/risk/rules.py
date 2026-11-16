@@ -3,47 +3,7 @@ Risk Rules and Threshold Definitions for Weather and Cargo Load.
 Based on Spotter Full Stack Assessment Specification.
 """
 
-from enum import IntEnum
-
-
-class RiskLevel(IntEnum):
-    """
-    Quantified Risk Levels:
-    1: Low
-    2: Moderate
-    3: High
-    4: Severe
-    5: No Travel
-    """
-
-    LOW = 1
-    MODERATE = 2
-    HIGH = 3
-    SEVERE = 4
-    NO_TRAVEL = 5
-
-    @property
-    def label(self) -> str:
-        labels = {
-            RiskLevel.LOW: "Low",
-            RiskLevel.MODERATE: "Moderate",
-            RiskLevel.HIGH: "High",
-            RiskLevel.SEVERE: "Severe",
-            RiskLevel.NO_TRAVEL: "No Travel",
-        }
-        return labels[self]
-
-    @property
-    def color(self) -> str:
-        """Hex color code for map pins and UI badges."""
-        colors = {
-            RiskLevel.LOW: "#22c55e",  # Green
-            RiskLevel.MODERATE: "#eab308",  # Yellow
-            RiskLevel.HIGH: "#f97316",  # Orange
-            RiskLevel.SEVERE: "#ef4444",  # Red
-            RiskLevel.NO_TRAVEL: "#7f1d1d",  # Dark Burgundy / Crimson
-        }
-        return colors[self]
+from .schemas import RiskLevel
 
 
 def classify_wind_risk(wind_mph: float) -> RiskLevel:

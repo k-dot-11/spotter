@@ -1,23 +1,6 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
-
-@dataclass
-class GeocodeResult:
-    lat: float
-    lon: float
-    display_name: str
-    place_id: str | None = None
-    bounding_box: list[float] | None = None
-
-    def to_dict(self):
-        return {
-            "lat": self.lat,
-            "lon": self.lon,
-            "display_name": self.display_name,
-            "place_id": self.place_id,
-            "bounding_box": self.bounding_box,
-        }
+from .schemas import GeocodeResult
 
 
 class BaseGeocodingService(ABC):

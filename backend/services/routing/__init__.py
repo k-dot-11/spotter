@@ -1,12 +1,12 @@
-from .base import BaseRoutingService, RawRoute
+from .base import BaseRoutingService
 from .osrm import OSRMRoutingService
-from .sampler import Checkpoint, haversine_distance_miles, sample_checkpoints_along_polyline
+from .sampler import sample_checkpoints_along_polyline
+from .schemas import Checkpoint, RawRoute
 
 __all__ = [
     "BaseRoutingService",
     "RawRoute",
     "OSRMRoutingService",
     "Checkpoint",
-    "haversine_distance_miles",
     "sample_checkpoints_along_polyline",
 ]
