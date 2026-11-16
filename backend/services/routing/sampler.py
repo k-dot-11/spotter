@@ -3,30 +3,11 @@ Spatial Polyline Interpolator and Checkpoint Sampler.
 Samples route coordinates every 10 / 25 / 50 miles, attaching accurate arrival ETAs.
 """
 
-import math
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
-# Earth radius in miles
-EARTH_RADIUS_MILES = 3958.8
-
-
-def haversine_distance_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """
-    Computes great-circle distance between two GPS points in miles.
-    """
-    phi1 = math.radians(lat1)
-    phi2 = math.radians(lat2)
-    delta_phi = math.radians(lat2 - lat1)
-    delta_lambda = math.radians(lon2 - lon1)
-
-    a = (
-        math.sin(delta_phi / 2.0) ** 2
-        + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2.0) ** 2
-    )
-    c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
-    return EARTH_RADIUS_MILES * c
+from services.common.geo import haversine_distance_miles
 
 
 @dataclass

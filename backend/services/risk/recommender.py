@@ -10,6 +10,8 @@ Applies the 4-tier preference hierarchy from the Spotter Assessment:
 from dataclasses import dataclass, field
 from typing import Any
 
+from services.common.time import format_duration
+
 from .rules import RiskLevel
 
 
@@ -65,15 +67,6 @@ class RouteRiskSummary:
             "recommendation_reason": self.recommendation_reason,
             "checkpoints": self.checkpoints,
         }
-
-
-def format_duration(seconds: float) -> str:
-    """Formats seconds into human readable 'Xh Ym'."""
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    if hours > 0:
-        return f"{hours}h {minutes}m"
-    return f"{minutes}m"
 
 
 def aggregate_route_risk(
