@@ -59,7 +59,7 @@ def geocode_view(request):
 
 
 @api_view(["POST"])
-def analyze_routes_view(request):
+def plan_trip_view(request):
     """
     Main Trip Planning & Risk Analysis Endpoint:
     - Generates 3 route options

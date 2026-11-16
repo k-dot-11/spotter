@@ -61,7 +61,7 @@ class GeocodeApiTestCase(TestCase):
 class TripAnalysisApiTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.url = reverse("routes-analyze")
+        self.url = reverse("trip-plan")
 
     @patch("services.weather.open_meteo.OpenMeteoWeatherService.fetch_batch_forecasts")
     @patch("services.routing.osrm.OSRMRoutingService.get_routes")
