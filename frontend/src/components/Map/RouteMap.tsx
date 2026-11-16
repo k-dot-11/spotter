@@ -30,6 +30,7 @@ const MapBoundsAdjuster: React.FC<{ routes: RouteSummary[] }> = ({ routes }) => 
   const map = useMap();
 
   useEffect(() => {
+    map.invalidateSize();
     if (!routes || routes.length === 0) return;
 
     const allPoints: [number, number][] = [];
@@ -41,7 +42,10 @@ const MapBoundsAdjuster: React.FC<{ routes: RouteSummary[] }> = ({ routes }) => 
 
     if (allPoints.length > 0) {
       const bounds = L.latLngBounds(allPoints);
-      map.fitBounds(bounds, { padding: [60, 60], maxZoom: 12 });
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 150);
     }
   }, [routes, map]);
 
@@ -97,10 +101,11 @@ export const RouteMap: React.FC<RouteMapProps> = ({
         scrollWheelZoom={true}
         style={{ width: '100%', height: '100%', background: '#090d16' }}
       >
-        {/* Official OpenStreetMap Standard Basemap (100% Free, Zero API Keys, Globally Open) */}
+        {/* CartoDB Voyager Basemap (Free, Open, Allowed by all browsers with CORS) */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png"
+          subdomains="abcd"
           maxZoom={19}
         />
 

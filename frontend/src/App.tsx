@@ -72,6 +72,7 @@ export const App: React.FC = () => {
               width: { xs: '100%', md: 440 },
               minWidth: { md: 420 },
               maxWidth: { md: 460 },
+              flexShrink: 0,
               height: '100%',
               overflowY: 'auto',
               p: 2.5,
