@@ -6,7 +6,7 @@ import TimerIcon from '@mui/icons-material/Timer';
 import RouteIcon from '@mui/icons-material/Route';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { RouteSummary } from '../../types/trip';
-import { getRouteColor } from '../Map/RoutePolyline';
+import { getRouteColor } from '../../utils/routeColors';
 
 interface RouteCardListProps {
   routes: RouteSummary[];
