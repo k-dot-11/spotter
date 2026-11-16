@@ -21,18 +21,18 @@ export const RoutePolyline: React.FC<RoutePolylineProps> = ({
   const isRecommended = route.is_recommended;
   const hasNoTravel = route.has_no_travel;
 
-  // Colors
-  const mainColor = isRecommended ? '#10b981' : hasNoTravel ? '#ef4444' : '#38bdf8';
+  // Colors matching standard Material colors
+  const mainColor = isRecommended ? '#2e7d32' : hasNoTravel ? '#d32f2f' : '#1976d2';
 
   return (
     <>
-      {/* Background shadow/border for crisp visibility against heatmap and basemap */}
+      {/* Background shadow/border for crisp visibility against map */}
       {isSelected && (
         <Polyline
           positions={positions}
           pathOptions={{
-            color: '#030712',
-            weight: 9,
+            color: '#ffffff',
+            weight: 8,
             opacity: 0.9,
             lineCap: 'round',
             lineJoin: 'round',
@@ -47,9 +47,9 @@ export const RoutePolyline: React.FC<RoutePolylineProps> = ({
           click: () => onSelect(route.route_id),
         }}
         pathOptions={{
-          color: isSelected ? mainColor : '#64748b',
+          color: isSelected ? mainColor : '#757575',
           weight: isSelected ? 5 : 3.5,
-          opacity: isSelected ? 1.0 : 0.45,
+          opacity: isSelected ? 1.0 : 0.5,
           dashArray: isSelected ? undefined : '5, 8',
           lineCap: 'round',
           lineJoin: 'round',

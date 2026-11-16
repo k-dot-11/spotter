@@ -1,10 +1,10 @@
 import React from 'react';
-import { Box, Card, Typography, Chip, Tooltip } from '@mui/material';
+import { Box, Card, Typography, Chip, Tooltip, CardContent } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import BlockIcon from '@mui/icons-material/Block';
 import TimerIcon from '@mui/icons-material/Timer';
 import RouteIcon from '@mui/icons-material/Route';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { RouteSummary } from '../../types/trip';
 
 interface RouteCardListProps {
@@ -22,7 +22,7 @@ export const RouteCardList: React.FC<RouteCardListProps> = ({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 1 }}>
-      <Typography variant="caption" sx={{ fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <Typography variant="subtitle2" color="text.secondary">
         Route Options Evaluated ({routes.length})
       </Typography>
 
@@ -42,160 +42,129 @@ export const RouteCardList: React.FC<RouteCardListProps> = ({
         return (
           <Card
             key={route.route_id}
+            variant="outlined"
             onClick={() => onSelectRoute(route.route_id)}
             sx={{
-              p: 1.6,
               cursor: 'pointer',
-              transition: 'all 0.2s ease-in-out',
-              border: isSelected
+              borderWidth: isSelected ? 2 : 1,
+              borderColor: isSelected
                 ? isRecommended
-                  ? '2px solid #10b981'
-                  : '2px solid #38bdf8'
-                : '1px solid rgba(255, 255, 255, 0.08)',
-              backgroundColor: isSelected
-                ? isRecommended
-                  ? 'rgba(16, 185, 129, 0.06)'
-                  : 'rgba(56, 189, 248, 0.06)'
-                : '#111827',
+                  ? 'success.main'
+                  : 'primary.main'
+                : 'divider',
+              boxShadow: isSelected ? 2 : 0,
+              bgcolor: isSelected ? 'action.selected' : 'background.paper',
               '&:hover': {
-                borderColor: isRecommended ? '#10b981' : '#38bdf8',
-                backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                bgcolor: 'action.hover',
               },
             }}
           >
-            {/* Header: Badge & Status */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.8 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                {isRecommended ? (
+            <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+              {/* Header: Badge & Status */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {isRecommended ? (
+                    <Chip
+                      icon={<CheckCircleIcon />}
+                      label="Recommended"
+                      color="success"
+                      size="small"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  ) : hasNoTravel ? (
+                    <Chip
+                      icon={<BlockIcon />}
+                      label="No Travel Warning"
+                      color="error"
+                      size="small"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  ) : (
+                    <Chip
+                      label={`Option ${route.rank}`}
+                      size="small"
+                      variant="outlined"
+                    />
+                  )}
+                </Box>
+
+                <Typography variant="body2" color="text.secondary">
+                  Avg Risk: <strong>{route.average_risk.toFixed(1)}</strong>
+                </Typography>
+              </Box>
+
+              {/* Route Name */}
+              <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
+                {route.route_name}
+              </Typography>
+
+              {/* Travel Stats: Time & Distance */}
+              <Box sx={{ display: 'flex', gap: 2, mb: 1.5 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <TimerIcon fontSize="small" color="primary" /> {route.duration_formatted}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <RouteIcon fontSize="small" color="action" /> {route.total_distance_miles} mi
+                </Typography>
+              </Box>
+
+              {/* Stacked Risk Progress Bar */}
+              <Tooltip title="Risk mileage breakdown: Green (Low), Yellow (Moderate), Orange (High), Red (Severe), Dark Red (No Travel)" arrow>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    height: 6,
+                    borderRadius: 1,
+                    overflow: 'hidden',
+                    bgcolor: 'grey.200',
+                    mb: 1.5,
+                  }}
+                >
+                  {lowPct > 0 && <Box sx={{ width: `${lowPct}%`, bgcolor: '#2e7d32' }} />}
+                  {modPct > 0 && <Box sx={{ width: `${modPct}%`, bgcolor: '#ed6c02' }} />}
+                  {highPct > 0 && <Box sx={{ width: `${highPct}%`, bgcolor: '#ef6c00' }} />}
+                  {sevPct > 0 && <Box sx={{ width: `${sevPct}%`, bgcolor: '#d32f2f' }} />}
+                  {noTravelPct > 0 && <Box sx={{ width: `${noTravelPct}%`, bgcolor: '#7f1d1d' }} />}
+                </Box>
+              </Tooltip>
+
+              {/* Mile Metrics Pills */}
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                <Chip
+                  label={`${route.severe_miles} mi Severe`}
+                  size="small"
+                  color={route.severe_miles > 0 ? 'error' : 'default'}
+                  variant="outlined"
+                />
+                <Chip
+                  label={`${route.high_miles} mi High`}
+                  size="small"
+                  color={route.high_miles > 0 ? 'warning' : 'default'}
+                  variant="outlined"
+                />
+                {route.no_travel_miles > 0 && (
                   <Chip
-                    icon={<CheckCircleIcon sx={{ fontSize: '13px !important', color: '#fff !important' }} />}
-                    label="RECOMMENDED"
+                    label={`${route.no_travel_miles} mi No Travel`}
                     size="small"
-                    sx={{
-                      backgroundColor: '#10b981',
-                      color: '#ffffff',
-                      fontSize: '0.68rem',
-                      fontWeight: 800,
-                      height: 22,
-                    }}
-                  />
-                ) : hasNoTravel ? (
-                  <Chip
-                    icon={<BlockIcon sx={{ fontSize: '13px !important', color: '#fff !important' }} />}
-                    label="NO TRAVEL WARNING"
-                    size="small"
-                    sx={{
-                      backgroundColor: '#7f1d1d',
-                      color: '#fecaca',
-                      fontSize: '0.68rem',
-                      fontWeight: 800,
-                      height: 22,
-                    }}
-                  />
-                ) : (
-                  <Chip
-                    label={`OPTION ${route.rank}`}
-                    size="small"
-                    sx={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                      color: '#94a3b8',
-                      fontSize: '0.68rem',
-                      height: 22,
-                    }}
+                    color="error"
                   />
                 )}
               </Box>
 
-              <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600 }}>
-                Avg Risk: <strong style={{ color: route.average_risk > 3 ? '#ef4444' : route.average_risk > 2 ? '#f59e0b' : '#10b981' }}>{route.average_risk.toFixed(1)}</strong>
+              {/* Recommendation Reasoning / Hazard Note */}
+              <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                {isRecommended ? (
+                  <span style={{ color: '#2e7d32', fontWeight: 500 }}>★ {route.recommendation_reason}</span>
+                ) : hasNoTravel ? (
+                  <span style={{ color: '#d32f2f', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <WarningAmberIcon fontSize="small" />
+                    {route.recommendation_reason}
+                  </span>
+                ) : (
+                  route.recommendation_reason
+                )}
               </Typography>
-            </Box>
-
-            {/* Route Name */}
-            <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: isSelected ? '#f8fafc' : '#cbd5e1' }}>
-              {route.route_name}
-            </Typography>
-
-            {/* Travel Stats: Time & Distance */}
-            <Box sx={{ display: 'flex', gap: 2, mb: 1.2 }}>
-              <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#e2e8f0', fontFamily: 'monospace' }}>
-                <TimerIcon sx={{ fontSize: 14, color: '#38bdf8' }} /> {route.duration_formatted}
-              </Typography>
-              <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#e2e8f0', fontFamily: 'monospace' }}>
-                <RouteIcon sx={{ fontSize: 14, color: '#94a3b8' }} /> {route.total_distance_miles} mi
-              </Typography>
-            </Box>
-
-            {/* Stacked Risk Progress Bar */}
-            <Tooltip title="Mileage breakdown: Green (Low), Yellow (Moderate), Orange (High), Red (Severe), Dark Red (No Travel)" arrow>
-              <Box
-                sx={{
-                  display: 'flex',
-                  height: 6,
-                  borderRadius: 3,
-                  overflow: 'hidden',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  mb: 1.2,
-                }}
-              >
-                {lowPct > 0 && <Box sx={{ width: `${lowPct}%`, backgroundColor: '#22c55e' }} />}
-                {modPct > 0 && <Box sx={{ width: `${modPct}%`, backgroundColor: '#eab308' }} />}
-                {highPct > 0 && <Box sx={{ width: `${highPct}%`, backgroundColor: '#f97316' }} />}
-                {sevPct > 0 && <Box sx={{ width: `${sevPct}%`, backgroundColor: '#ef4444' }} />}
-                {noTravelPct > 0 && <Box sx={{ width: `${noTravelPct}%`, backgroundColor: '#7f1d1d' }} />}
-              </Box>
-            </Tooltip>
-
-            {/* Mile Metrics Pills */}
-            <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap', mb: 1 }}>
-              <Chip
-                label={`${route.severe_miles} mi Severe`}
-                size="small"
-                sx={{
-                  height: 20,
-                  fontSize: '0.65rem',
-                  backgroundColor: route.severe_miles > 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                  color: route.severe_miles > 0 ? '#fca5a5' : '#94a3b8',
-                }}
-              />
-              <Chip
-                label={`${route.high_miles} mi High`}
-                size="small"
-                sx={{
-                  height: 20,
-                  fontSize: '0.65rem',
-                  backgroundColor: route.high_miles > 0 ? 'rgba(249, 115, 22, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                  color: route.high_miles > 0 ? '#fdba74' : '#94a3b8',
-                }}
-              />
-              {route.no_travel_miles > 0 && (
-                <Chip
-                  label={`${route.no_travel_miles} mi No Travel`}
-                  size="small"
-                  sx={{
-                    height: 20,
-                    fontSize: '0.65rem',
-                    backgroundColor: 'rgba(127, 29, 29, 0.3)',
-                    color: '#fca5a5',
-                    fontWeight: 700,
-                  }}
-                />
-              )}
-            </Box>
-
-            {/* Recommendation Reasoning / Hazard Note */}
-            <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: 0.5, lineHeight: 1.3 }}>
-              {isRecommended ? (
-                <span style={{ color: '#34d399' }}>★ {route.recommendation_reason}</span>
-              ) : hasNoTravel ? (
-                <span style={{ color: '#f87171' }}>
-                  <WarningAmberIcon sx={{ fontSize: 12, verticalAlign: 'middle', mr: 0.3 }} />
-                  {route.recommendation_reason}
-                </span>
-              ) : (
-                route.recommendation_reason
-              )}
-            </Typography>
+            </CardContent>
           </Card>
         );
       })}

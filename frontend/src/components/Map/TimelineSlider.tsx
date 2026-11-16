@@ -9,6 +9,7 @@ import {
   ToggleButtonGroup,
   Switch,
   FormControlLabel,
+  Paper,
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -51,7 +52,7 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
     if (isPlaying) {
       interval = setInterval(() => {
         onHourChange((prev) => (prev >= maxHours ? 0 : prev + 1));
-      }, 700); // 700ms per forecast hour
+      }, 700);
     }
     return () => clearInterval(interval);
   }, [isPlaying, maxHours, onHourChange]);
@@ -75,7 +76,8 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
   };
 
   return (
-    <Box
+    <Paper
+      elevation={4}
       sx={{
         position: 'absolute',
         bottom: 24,
@@ -84,12 +86,7 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
         zIndex: 1000,
         width: '90%',
         maxWidth: 780,
-        backgroundColor: 'rgba(15, 23, 42, 0.92)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.12)',
-        borderRadius: 3,
         p: 2,
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
         display: 'flex',
         flexDirection: 'column',
         gap: 1.5,
@@ -99,74 +96,47 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
         {/* Play / Step Buttons */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Tooltip title="Step Back 1 Hour">
-            <span>
-              <IconButton
-                size="small"
-                disabled={forecastHour <= 0}
-                onClick={() => onHourChange(Math.max(0, forecastHour - 1))}
-                sx={{ color: '#94a3b8' }}
-              >
-                <FastRewindIcon fontSize="small" />
-              </IconButton>
-            </span>
+          <Tooltip title="Jump to Start (0h)">
+            <IconButton size="small" onClick={() => onHourChange(0)}>
+              <FastRewindIcon fontSize="small" />
+            </IconButton>
           </Tooltip>
 
-          <Tooltip title={isPlaying ? 'Pause Animation' : 'Play Weather Evolution'}>
+          <Tooltip title={isPlaying ? 'Pause Animation' : 'Play Forecast Timeline'}>
             <IconButton
               size="small"
+              color="primary"
               onClick={() => setIsPlaying(!isPlaying)}
-              sx={{
-                backgroundColor: isPlaying ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                color: isPlaying ? '#ef4444' : '#10b981',
-                '&:hover': {
-                  backgroundColor: isPlaying ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)',
-                },
-              }}
             >
               {isPlaying ? <PauseIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Step Forward 1 Hour">
-            <span>
-              <IconButton
-                size="small"
-                disabled={forecastHour >= maxHours}
-                onClick={() => onHourChange(Math.min(maxHours, forecastHour + 1))}
-                sx={{ color: '#94a3b8' }}
-              >
-                <FastForwardIcon fontSize="small" />
-              </IconButton>
-            </span>
+          <Tooltip title="Jump to End (+48h)">
+            <IconButton size="small" onClick={() => onHourChange(maxHours)}>
+              <FastForwardIcon fontSize="small" />
+            </IconButton>
           </Tooltip>
 
-          <Typography variant="body2" sx={{ ml: 1, fontWeight: 700, color: '#f8fafc', fontFamily: 'monospace' }}>
-            +{forecastHour}h <span style={{ color: '#38bdf8', fontWeight: 500 }}>({getForecastTimeString()})</span>
+          <Typography variant="body2" sx={{ fontWeight: 600, ml: 1 }}>
+            +{forecastHour}h ({getForecastTimeString()})
           </Typography>
         </Box>
 
-        {/* Heatmap Layer Toggles */}
+        {/* Heatmap Layer Controls */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <FormControlLabel
             control={
               <Switch
                 size="small"
+                color="primary"
                 checked={showHeatmap}
                 onChange={(e) => onToggleHeatmap(e.target.checked)}
-                sx={{
-                  '& .MuiSwitch-switchBase.Mui-checked': {
-                    color: '#10b981',
-                  },
-                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                    backgroundColor: '#10b981',
-                  },
-                }}
               />
             }
             label={
-              <Typography variant="caption" sx={{ color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <LayersIcon sx={{ fontSize: 14 }} /> Heatmap
+              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <LayersIcon fontSize="small" /> Heatmap
               </Typography>
             }
             sx={{ m: 0 }}
@@ -177,22 +147,8 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
               value={heatmapMetric}
               exclusive
               size="small"
-              onChange={(_, val) => val !== null && onMetricChange(val)}
-              sx={{
-                height: 24,
-                '& .MuiToggleButton-root': {
-                  px: 0.8,
-                  py: 0,
-                  fontSize: '0.68rem',
-                  color: '#94a3b8',
-                  borderColor: 'rgba(255, 255, 255, 0.1)',
-                  '&.Mui-selected': {
-                    color: '#38bdf8',
-                    backgroundColor: 'rgba(56, 189, 248, 0.15)',
-                    fontWeight: 700,
-                  },
-                },
-              }}
+              color="primary"
+              onChange={(_, val) => val && onMetricChange(val)}
             >
               <ToggleButton value="risk">Risk</ToggleButton>
               <ToggleButton value="wind">Wind</ToggleButton>
@@ -202,64 +158,51 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
         </Box>
       </Box>
 
-      {/* Main 0–48h Scrubber Slider */}
+      {/* Forecast Scrubber Slider */}
       <Box sx={{ px: 1 }}>
         <Slider
           value={forecastHour}
           min={0}
           max={maxHours}
           step={1}
-          onChange={(_, val) => onHourChange(val as number)}
-          sx={{
-            color: '#38bdf8',
-            height: 6,
-            py: 1,
-            '& .MuiSlider-thumb': {
-              width: 16,
-              height: 16,
-              boxShadow: '0 0 10px rgba(56, 189, 248, 0.8)',
-            },
-            '& .MuiSlider-rail': {
-              backgroundColor: 'rgba(255, 255, 255, 0.15)',
-            },
+          valueLabelDisplay="auto"
+          valueLabelFormat={(val) => `+${val}h`}
+          onChange={(_, val) => {
+            setIsPlaying(false);
+            onHourChange(val as number);
           }}
+          marks={[
+            { value: 0, label: '0h (Departure)' },
+            { value: 12, label: '12h' },
+            { value: 24, label: '24h (+1 Day)' },
+            { value: 36, label: '36h' },
+            { value: 48, label: '48h (+2 Days)' },
+          ]}
         />
-
-        {/* Milestone Marks */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#64748b', mt: -0.5 }}>
-          <span>0h (Departure)</span>
-          <span>12h</span>
-          <span>24h (+1 Day)</span>
-          <span>36h</span>
-          <span>48h (+2 Days)</span>
-        </Box>
       </Box>
 
-      {/* Optional Opacity Fine-tuning (visible when heatmap is on) */}
+      {/* Heatmap Opacity Scrubber */}
       {showHeatmap && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 1, pt: 0.5, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.68rem', width: 90 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 1 }}>
+          <Typography variant="caption" color="text.secondary" sx={{ minWidth: 80 }}>
             Layer Opacity:
           </Typography>
           <Slider
-            value={heatmapOpacity}
-            min={0.15}
-            max={0.9}
-            step={0.05}
             size="small"
+            value={heatmapOpacity}
+            min={0.1}
+            max={1.0}
+            step={0.05}
+            valueLabelDisplay="auto"
+            valueLabelFormat={(val) => `${Math.round(val * 100)}%`}
             onChange={(_, val) => onOpacityChange(val as number)}
-            sx={{
-              color: '#94a3b8',
-              height: 4,
-              maxWidth: 150,
-              '& .MuiSlider-thumb': { width: 12, height: 12 },
-            }}
+            sx={{ maxWidth: 200 }}
           />
-          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.68rem' }}>
+          <Typography variant="caption" color="text.secondary">
             {Math.round(heatmapOpacity * 100)}%
           </Typography>
         </Box>
       )}
-    </Box>
+    </Paper>
   );
 };

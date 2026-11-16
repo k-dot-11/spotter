@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Box, ThemeProvider, CssBaseline, Alert, Snackbar } from '@mui/material';
-import { darkTheme } from './theme';
+import { theme } from './theme';
 import { Header } from './components/Header';
 import { TripForm } from './components/Sidebar/TripForm';
 import { RouteCardList } from './components/Sidebar/RouteCardList';
@@ -40,7 +40,7 @@ export const App: React.FC = () => {
       });
       setTripData(data);
       setSelectedRouteId(data.recommended_route_id || data.routes[0]?.route_id || '');
-      setForecastHour(0); // Reset slider to departure time
+      setForecastHour(0);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to analyze route. Please verify your inputs.');
     } finally {
@@ -60,14 +60,14 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', overflow: 'hidden' }}>
         {/* Top Header */}
         <Header />
 
-        {/* Main Cockpit Split Layout: Fixed Left Sidebar + Dedicated Fixed Right Map Container */}
-        <Box sx={{ display: 'flex', flex: 1, height: 'calc(100vh - 52px)', width: '100vw', overflow: 'hidden' }}>
+        {/* Main Cockpit Split Layout: Left Sidebar + Dedicated Fixed Right Map Container */}
+        <Box sx={{ display: 'flex', flex: 1, height: 'calc(100vh - 48px)', width: '100vw', overflow: 'hidden' }}>
           {/* Left Sidebar: Fixed Width Container (440px) */}
           <Box
             component="aside"
@@ -77,17 +77,15 @@ export const App: React.FC = () => {
               maxWidth: 440,
               height: '100%',
               overflowY: 'auto',
-              p: 2.5,
-              backgroundColor: '#0d131f',
-              borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+              p: 2,
+              bgcolor: 'background.paper',
+              borderRight: 1,
+              borderColor: 'divider',
               display: 'flex',
               flexDirection: 'column',
-              gap: 2.5,
+              gap: 2,
               flexShrink: 0,
               zIndex: 10,
-              boxShadow: '4px 0 24px rgba(0, 0, 0, 0.5)',
-              '&::-webkit-scrollbar': { width: 6 },
-              '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 3 },
             }}
           >
             {/* Input Form */}
@@ -112,7 +110,7 @@ export const App: React.FC = () => {
               height: '100%',
               position: 'relative',
               overflow: 'hidden',
-              backgroundColor: '#090d16',
+              bgcolor: '#e0e0e0',
             }}
           >
             <RouteMap
@@ -140,7 +138,7 @@ export const App: React.FC = () => {
           onClose={() => setErrorMessage(null)}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          <Alert severity="error" onClose={() => setErrorMessage(null)} sx={{ width: '100%', backgroundColor: '#7f1d1d', color: '#fecaca' }}>
+          <Alert severity="error" onClose={() => setErrorMessage(null)} sx={{ width: '100%' }}>
             {errorMessage}
           </Alert>
         </Snackbar>

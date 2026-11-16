@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Chip,
   Alert,
+  Paper,
 } from '@mui/material';
 import NavigationIcon from '@mui/icons-material/Navigation';
 import ScaleIcon from '@mui/icons-material/Scale';
@@ -121,21 +122,21 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Quick Presets */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap' }}>
-        <Typography variant="caption" sx={{ color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <FlashOnIcon sx={{ fontSize: 13, color: '#f59e0b' }} /> Quick Corridors:
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+        <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <FlashOnIcon fontSize="small" color="primary" /> Quick Corridors:
         </Typography>
         <Chip
           label="Chicago → Indy"
           size="small"
           onClick={() => applyPreset('Chicago, IL', 'Indianapolis, IN', 35000)}
-          sx={{ fontSize: '0.7rem', height: 22, cursor: 'pointer', backgroundColor: 'rgba(255,255,255,0.06)' }}
+          clickable
         />
         <Chip
           label="Dallas → KC (Heavy)"
           size="small"
           onClick={() => applyPreset('Dallas, TX', 'Kansas City, MO', 44000)}
-          sx={{ fontSize: '0.7rem', height: 22, cursor: 'pointer', backgroundColor: 'rgba(255,255,255,0.06)' }}
+          clickable
         />
       </Box>
 
@@ -162,7 +163,7 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
             InputProps={{
               ...params.InputProps,
               startAdornment: (
-                <NavigationIcon sx={{ fontSize: 16, color: '#10b981', mr: 1, transform: 'rotate(45deg)' }} />
+                <NavigationIcon color="primary" sx={{ mr: 1, transform: 'rotate(45deg)', fontSize: 18 }} />
               ),
               endAdornment: (
                 <>
@@ -198,7 +199,7 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
             InputProps={{
               ...params.InputProps,
               startAdornment: (
-                <NavigationIcon sx={{ fontSize: 16, color: '#ef4444', mr: 1, transform: 'rotate(135deg)' }} />
+                <NavigationIcon color="secondary" sx={{ mr: 1, transform: 'rotate(135deg)', fontSize: 18 }} />
               ),
               endAdornment: (
                 <>
@@ -221,17 +222,17 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
         onChange={(e) => setDepartureTime(e.target.value)}
         InputLabelProps={{ shrink: true }}
         InputProps={{
-          startAdornment: <AccessTimeIcon sx={{ fontSize: 16, color: '#38bdf8', mr: 1 }} />,
+          startAdornment: <AccessTimeIcon color="action" sx={{ mr: 1, fontSize: 18 }} />,
         }}
       />
 
       {/* Load Weight */}
-      <Box sx={{ p: 1.5, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <Paper variant="outlined" sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="body2" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.8 }}>
-            <ScaleIcon sx={{ fontSize: 16, color: '#f59e0b' }} /> Cargo Load Weight:
+          <Typography variant="body2" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <ScaleIcon fontSize="small" color="action" /> Cargo Load Weight:
           </Typography>
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 700, color: '#f8fafc' }}>
+          <Typography variant="body2" sx={{ fontWeight: 700 }}>
             {weightLbs.toLocaleString()} lbs
           </Typography>
         </Box>
@@ -241,61 +242,40 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
           min={5000}
           max={80000}
           step={1000}
+          color={isHighWeightEscalation ? 'error' : isModerateWeightEscalation ? 'warning' : 'primary'}
           onChange={(_, val) => setWeightLbs(val as number)}
-          sx={{
-            color: isHighWeightEscalation ? '#ef4444' : isModerateWeightEscalation ? '#f59e0b' : '#10b981',
-            height: 6,
-            '& .MuiSlider-thumb': {
-              width: 16,
-              height: 16,
-            },
-          }}
         />
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#64748b' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'text.secondary' }}>
           <span>Empty (5k)</span>
-          <span style={{ color: weightLbs > 30000 ? '#f59e0b' : 'inherit' }}>30k (Rule Threshold)</span>
-          <span style={{ color: weightLbs > 40000 ? '#ef4444' : 'inherit' }}>40k (Heavy Threshold)</span>
-          <span>80k (Max Legal)</span>
+          <span>30k (Rule Threshold)</span>
+          <span>40k (Heavy Threshold)</span>
+          <span>80k (Max)</span>
         </Box>
 
         {isHighWeightEscalation && (
-          <Alert severity="warning" sx={{ mt: 1.2, py: 0.2, px: 1, fontSize: '0.72rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#fca5a5' }}>
+          <Alert severity="warning" sx={{ mt: 1.5 }}>
             Weight &gt; 40,000 lbs: 35–44 mph winds escalate to <strong>Severe</strong>.
           </Alert>
         )}
         {!isHighWeightEscalation && isModerateWeightEscalation && (
-          <Alert severity="info" sx={{ mt: 1.2, py: 0.2, px: 1, fontSize: '0.72rem', backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#fcd34d' }}>
+          <Alert severity="info" sx={{ mt: 1.5 }}>
             Weight &gt; 30,000 lbs: 45–54 mph winds escalate to <strong>No Travel</strong>.
           </Alert>
         )}
-      </Box>
+      </Paper>
 
       {/* Sampling Interval Selector */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#94a3b8' }}>
-          <StraightenIcon sx={{ fontSize: 16 }} /> Checkpoint Spacing:
+        <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <StraightenIcon fontSize="small" /> Checkpoint Spacing:
         </Typography>
         <ToggleButtonGroup
           value={intervalMiles}
           exclusive
           size="small"
+          color="primary"
           onChange={(_, val) => val !== null && setIntervalMiles(val)}
-          sx={{
-            height: 30,
-            '& .MuiToggleButton-root': {
-              px: 1.2,
-              py: 0.2,
-              fontSize: '0.75rem',
-              color: '#94a3b8',
-              borderColor: 'rgba(255, 255, 255, 0.1)',
-              '&.Mui-selected': {
-                color: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                fontWeight: 700,
-              },
-            },
-          }}
         >
           <ToggleButton value={10}>10 mi</ToggleButton>
           <ToggleButton value={25}>25 mi</ToggleButton>
@@ -307,18 +287,13 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
       <Button
         type="submit"
         variant="contained"
+        color="primary"
+        size="large"
         disabled={isLoading || !origin || !destination}
-        sx={{
-          py: 1.2,
-          fontSize: '0.92rem',
-          backgroundColor: '#10b981',
-          '&:hover': { backgroundColor: '#059669' },
-          boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
-        }}
       >
         {isLoading ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <CircularProgress size={18} color="inherit" />
+            <CircularProgress size={20} color="inherit" />
             <span>Analyzing Weather Corridors...</span>
           </Box>
         ) : (
