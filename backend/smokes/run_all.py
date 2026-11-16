@@ -10,6 +10,7 @@ Runs:
 import sys
 import time
 
+from test_e2e_analyze import test_live_trip_analysis
 from test_geocoding_nominatim import test_nominatim_geocoding
 from test_routing_osrm import test_osrm_routing
 from test_weather_open_meteo import test_open_meteo_weather
@@ -17,13 +18,14 @@ from test_weather_open_meteo import test_open_meteo_weather
 
 def main():
     print("=" * 60)
-    print("🚀 RUNNING THIRD-PARTY API SMOKE TESTS (ZERO SIGN-UP APIS)")
+    print("🚀 RUNNING THIRD-PARTY API & PIPELINE SMOKE TESTS")
     print("=" * 60)
 
     tests = [
         ("Geocoding (Nominatim / OpenStreetMap)", test_nominatim_geocoding),
         ("Routing (Project OSRM Driving Engine)", test_osrm_routing),
         ("Weather (Open-Meteo Multi-Coordinate Forecast)", test_open_meteo_weather),
+        ("End-to-End Orchestrator Pipeline", test_live_trip_analysis),
     ]
 
     all_passed = True
