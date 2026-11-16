@@ -101,12 +101,17 @@ export const RouteMap: React.FC<RouteMapProps> = ({
         scrollWheelZoom={true}
         style={{ width: '100%', height: '100%', background: '#090d16' }}
       >
-        {/* CartoDB Voyager Basemap (Free, Open, Allowed by all browsers with CORS) */}
+        {/* Esri World Dark Gray Basemap (100% Free, Zero API Keys, No Watermark, Dark Theme) */}
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png"
-          subdomains="abcd"
-          maxZoom={19}
+          attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+          maxZoom={16}
+        />
+        {/* State borders and city labels */}
+        <TileLayer
+          attribution=""
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+          maxZoom={16}
         />
 
         <MapBoundsAdjuster routes={routes} />
