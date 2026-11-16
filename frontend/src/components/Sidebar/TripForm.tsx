@@ -9,15 +9,12 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   CircularProgress,
-  Chip,
-  Alert,
   Paper,
 } from '@mui/material';
 import NavigationIcon from '@mui/icons-material/Navigation';
 import ScaleIcon from '@mui/icons-material/Scale';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StraightenIcon from '@mui/icons-material/Straighten';
-import FlashOnIcon from '@mui/icons-material/FlashOn';
 import { geocodeCities } from '../../api/client';
 import { GeocodeResultItem } from '../../types/trip';
 
@@ -109,38 +106,9 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
     });
   };
 
-  const applyPreset = (orig: string, dest: string, wt: number) => {
-    setOrigin(orig);
-    setDestination(dest);
-    setWeightLbs(wt);
-  };
-
-  // Weight escalation warning indicators based on PDF rules
-  const isHighWeightEscalation = weightLbs > 40000;
-  const isModerateWeightEscalation = weightLbs > 30000;
-
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {/* Quick Presets */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-        <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <FlashOnIcon fontSize="small" color="primary" /> Quick Corridors:
-        </Typography>
-        <Chip
-          label="Chicago → Indy"
-          size="small"
-          onClick={() => applyPreset('Chicago, IL', 'Indianapolis, IN', 35000)}
-          clickable
-        />
-        <Chip
-          label="Dallas → KC (Heavy)"
-          size="small"
-          onClick={() => applyPreset('Dallas, TX', 'Kansas City, MO', 44000)}
-          clickable
-        />
-      </Box>
-
-      {/* Origin Input */}
+    <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      {/* 1. Origin Input */}
       <Autocomplete
         freeSolo
         options={originOptions}
@@ -176,7 +144,7 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
         )}
       />
 
-      {/* Destination Input */}
+      {/* 2. Destination Input */}
       <Autocomplete
         freeSolo
         options={destinationOptions}
@@ -212,7 +180,7 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
         )}
       />
 
-      {/* Departure Date/Time */}
+      {/* 3. Departure Date/Time */}
       <TextField
         label="Departure Date & Time"
         type="datetime-local"
@@ -226,7 +194,7 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
         }}
       />
 
-      {/* Load Weight */}
+      {/* 4. Cargo Load Weight */}
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
           <Typography variant="body2" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -242,30 +210,18 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
           min={5000}
           max={80000}
           step={1000}
-          color={isHighWeightEscalation ? 'error' : isModerateWeightEscalation ? 'warning' : 'primary'}
+          valueLabelDisplay="auto"
+          valueLabelFormat={(val) => `${val.toLocaleString()} lbs`}
           onChange={(_, val) => setWeightLbs(val as number)}
         />
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'text.secondary' }}>
-          <span>Empty (5k)</span>
-          <span>30k (Rule Threshold)</span>
-          <span>40k (Heavy Threshold)</span>
-          <span>80k (Max)</span>
+          <span>5,000 lbs</span>
+          <span>80,000 lbs</span>
         </Box>
-
-        {isHighWeightEscalation && (
-          <Alert severity="warning" sx={{ mt: 1.5 }}>
-            Weight &gt; 40,000 lbs: 35–44 mph winds escalate to <strong>Severe</strong>.
-          </Alert>
-        )}
-        {!isHighWeightEscalation && isModerateWeightEscalation && (
-          <Alert severity="info" sx={{ mt: 1.5 }}>
-            Weight &gt; 30,000 lbs: 45–54 mph winds escalate to <strong>No Travel</strong>.
-          </Alert>
-        )}
       </Paper>
 
-      {/* Sampling Interval Selector */}
+      {/* 5. Checkpoint Spacing */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <StraightenIcon fontSize="small" /> Checkpoint Spacing:
@@ -283,7 +239,7 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
         </ToggleButtonGroup>
       </Box>
 
-      {/* Submit Button */}
+      {/* 6. Submit Button */}
       <Button
         type="submit"
         variant="contained"
