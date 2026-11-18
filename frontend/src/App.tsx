@@ -2,14 +2,18 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Box, ThemeProvider, CssBaseline, Alert, Snackbar } from '@mui/material';
 import { theme } from './theme';
 import { Header } from './components/Header';
-import { TripForm } from './components/Sidebar/TripForm';
+import { LandingScreen } from './components/Landing/LandingScreen';
+import { TripForm, TripFormValues } from './components/Sidebar/TripForm';
 import { RouteCardList } from './components/Sidebar/RouteCardList';
 import { RouteMap } from './components/Map/RouteMap';
 import { HeatmapMetric } from './components/Map/TimelineSlider';
 import { planTrip } from './api/client';
 import { TripPlanResponse } from './types/trip';
 
+export type ViewMode = 'landing' | 'cockpit';
+
 export const App: React.FC = () => {
+  const [viewMode, setViewMode] = useState<ViewMode>('landing');
   const [tripData, setTripData] = useState<TripPlanResponse | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string>('');
   const [forecastHour, setForecastHour] = useState<number>(0);
@@ -19,17 +23,28 @@ export const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Cached form values so user inputs are preserved across screen switches
+  const [formValues, setFormValues] = useState<TripFormValues>({
+    origin: 'Chicago, IL',
+    destination: 'Indianapolis, IN',
+    departureTime: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
+    weightLbs: 35000,
+    intervalMiles: 25,
+  });
+
   const routes = useMemo(() => tripData?.routes || [], [tripData]);
 
-  const handleTripSubmit = async (params: {
-    origin: string;
-    destination: string;
-    departureTime: string;
-    weightLbs: number;
-    intervalMiles: number;
-  }) => {
+  const handleTripSubmit = async (params: TripFormValues) => {
+    setFormValues(params);
+    setViewMode('cockpit');
     setIsLoading(true);
     setErrorMessage(null);
+
+    // Sync with browser history for natural back-button support
+    if (window.location.hash !== '#cockpit') {
+      window.history.pushState({ view: 'cockpit' }, '', '#cockpit');
+    }
+
     try {
       const data = await planTrip({
         origin: params.origin,
@@ -48,88 +63,115 @@ export const App: React.FC = () => {
     }
   };
 
-  // Run initial demo route on first load so user immediately sees populated routes & heatmap
+  const handleBackToLanding = () => {
+    setViewMode('landing');
+    if (window.location.hash) {
+      window.history.pushState({ view: 'landing' }, '', window.location.pathname);
+    }
+  };
+
+  // Browser back / forward button navigation listener
   useEffect(() => {
-    handleTripSubmit({
-      origin: 'Chicago, IL',
-      destination: 'Indianapolis, IN',
-      departureTime: new Date().toISOString(),
-      weightLbs: 35000,
-      intervalMiles: 25,
-    });
-  }, []);
+    const handlePopState = () => {
+      if (window.location.hash === '#cockpit' && tripData) {
+        setViewMode('cockpit');
+      } else {
+        setViewMode('landing');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [tripData]);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', overflow: 'hidden' }}>
         {/* Top Header */}
-        <Header />
+        <Header
+          showBack={viewMode === 'cockpit'}
+          onBack={viewMode === 'cockpit' ? handleBackToLanding : undefined}
+        />
 
-        {/* Main Cockpit Split Layout: Left Sidebar + Dedicated Fixed Right Map Container */}
-        <Box sx={{ display: 'flex', flex: 1, height: 'calc(100vh - 48px)', width: '100vw', overflow: 'hidden' }}>
-          {/* Left Sidebar: Fixed Width Container (440px) */}
-          <Box
-            component="aside"
-            sx={{
-              width: 440,
-              minWidth: 440,
-              maxWidth: 440,
-              height: '100%',
-              overflowY: 'auto',
-              p: 2,
-              bgcolor: 'background.paper',
-              borderRight: 1,
-              borderColor: 'divider',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-              flexShrink: 0,
-              zIndex: 10,
-            }}
-          >
-            {/* Input Form */}
-            <TripForm onSubmit={handleTripSubmit} isLoading={isLoading} />
+        {/* Screen 1: Centralized Landing Screen */}
+        {viewMode === 'landing' && (
+          <LandingScreen
+            initialValues={formValues}
+            onSubmit={handleTripSubmit}
+            isLoading={isLoading}
+          />
+        )}
 
-            {/* Evaluated Route Cards */}
-            {tripData && (
-              <RouteCardList
+        {/* Screen 2: Cockpit Map & Route Evaluation Screen */}
+        {viewMode === 'cockpit' && (
+          <Box sx={{ display: 'flex', flex: 1, height: 'calc(100vh - 48px)', width: '100vw', overflow: 'hidden' }}>
+            {/* Left Sidebar: Fixed Width Container (440px) */}
+            <Box
+              component="aside"
+              sx={{
+                width: 440,
+                minWidth: 440,
+                maxWidth: 440,
+                height: '100%',
+                overflowY: 'auto',
+                p: 2,
+                bgcolor: 'background.paper',
+                borderRight: 1,
+                borderColor: 'divider',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                flexShrink: 0,
+                zIndex: 10,
+              }}
+            >
+              {/* Input Form with preserved values */}
+              <TripForm
+                initialValues={formValues}
+                onSubmit={handleTripSubmit}
+                isLoading={isLoading}
+              />
+
+              {/* Evaluated Route Cards */}
+              {tripData && (
+                <RouteCardList
+                  routes={routes}
+                  selectedRouteId={selectedRouteId}
+                  onSelectRoute={setSelectedRouteId}
+                />
+              )}
+            </Box>
+
+            {/* Right Area: Dedicated Fixed Map Container */}
+            <Box
+              component="main"
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                height: '100%',
+                position: 'relative',
+                overflow: 'hidden',
+                bgcolor: '#e0e0e0',
+              }}
+            >
+              <RouteMap
                 routes={routes}
                 selectedRouteId={selectedRouteId}
                 onSelectRoute={setSelectedRouteId}
+                corridorHeatmap={tripData?.corridor_heatmap}
+                departureTimeIso={tripData?.departure_time}
+                forecastHour={forecastHour}
+                onHourChange={setForecastHour}
+                heatmapMetric={heatmapMetric}
+                onMetricChange={setHeatmapMetric}
+                showHeatmap={showHeatmap}
+                onToggleHeatmap={setShowHeatmap}
+                heatmapOpacity={heatmapOpacity}
+                onOpacityChange={setHeatmapOpacity}
               />
-            )}
+            </Box>
           </Box>
-
-          {/* Right Area: Dedicated Fixed Map Container */}
-          <Box
-            component="main"
-            sx={{
-              flex: 1,
-              minWidth: 0,
-              height: '100%',
-              position: 'relative',
-              overflow: 'hidden',
-              bgcolor: '#e0e0e0',
-            }}
-          >
-            <RouteMap
-              routes={routes}
-              selectedRouteId={selectedRouteId}
-              onSelectRoute={setSelectedRouteId}
-              corridorHeatmap={tripData?.corridor_heatmap}
-              departureTimeIso={tripData?.departure_time}
-              forecastHour={forecastHour}
-              onHourChange={setForecastHour}
-              heatmapMetric={heatmapMetric}
-              onMetricChange={setHeatmapMetric}
-              showHeatmap={showHeatmap}
-              onToggleHeatmap={setShowHeatmap}
-              heatmapOpacity={heatmapOpacity}
-              onOpacityChange={setHeatmapOpacity}
-            />
-          </Box>
-        </Box>
+        )}
 
         {/* Error Snackbar */}
         <Snackbar

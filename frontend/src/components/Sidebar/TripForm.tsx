@@ -18,21 +18,21 @@ import StraightenIcon from '@mui/icons-material/Straighten';
 import { geocodeCities } from '../../api/client';
 import { GeocodeResultItem } from '../../types/trip';
 
+export interface TripFormValues {
+  origin: string;
+  destination: string;
+  departureTime: string;
+  weightLbs: number;
+  intervalMiles: number;
+}
+
 interface TripFormProps {
-  onSubmit: (params: {
-    origin: string;
-    destination: string;
-    departureTime: string;
-    weightLbs: number;
-    intervalMiles: number;
-  }) => void;
+  initialValues?: Partial<TripFormValues>;
+  onSubmit: (params: TripFormValues) => void;
   isLoading: boolean;
 }
 
-export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
-  const [origin, setOrigin] = useState<string>('Chicago, IL');
-  const [destination, setDestination] = useState<string>('Indianapolis, IN');
-
+export const TripForm: React.FC<TripFormProps> = ({ initialValues, onSubmit, isLoading }) => {
   // Format current local time for datetime-local input
   const getNowFormatted = () => {
     const now = new Date();
@@ -40,9 +40,11 @@ export const TripForm: React.FC<TripFormProps> = ({ onSubmit, isLoading }) => {
     return now.toISOString().slice(0, 16);
   };
 
-  const [departureTime, setDepartureTime] = useState<string>(getNowFormatted());
-  const [weightLbs, setWeightLbs] = useState<number>(35000);
-  const [intervalMiles, setIntervalMiles] = useState<number>(25);
+  const [origin, setOrigin] = useState<string>(initialValues?.origin ?? 'Chicago, IL');
+  const [destination, setDestination] = useState<string>(initialValues?.destination ?? 'Indianapolis, IN');
+  const [departureTime, setDepartureTime] = useState<string>(initialValues?.departureTime ?? getNowFormatted());
+  const [weightLbs, setWeightLbs] = useState<number>(initialValues?.weightLbs ?? 35000);
+  const [intervalMiles, setIntervalMiles] = useState<number>(initialValues?.intervalMiles ?? 25);
 
   // Autocomplete suggestions
   const [originOptions, setOriginOptions] = useState<string[]>([]);
