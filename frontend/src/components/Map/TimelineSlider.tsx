@@ -77,16 +77,21 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
 
   return (
     <Paper
-      elevation={4}
+      elevation={6}
       sx={{
         position: 'absolute',
         bottom: 24,
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 1000,
-        width: '90%',
-        maxWidth: 780,
+        width: 'calc(100% - 48px)',
+        maxWidth: 720,
         p: 2,
+        borderRadius: 2,
+        border: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
         display: 'flex',
         flexDirection: 'column',
         gap: 1.5,
@@ -118,9 +123,14 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
             </IconButton>
           </Tooltip>
 
-          <Typography variant="body2" sx={{ fontWeight: 600, ml: 1 }}>
-            +{forecastHour}h ({getForecastTimeString()})
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, ml: 1 }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.light', whiteSpace: 'nowrap' }}>
+              +{forecastHour}h
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', whiteSpace: 'nowrap', fontSize: '0.8rem' }}>
+              ({getForecastTimeString()})
+            </Typography>
+          </Box>
         </Box>
 
         {/* Heatmap Layer Controls */}
@@ -135,7 +145,7 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
               />
             }
             label={
-              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 500 }}>
                 <LayersIcon fontSize="small" /> Heatmap
               </Typography>
             }
@@ -149,6 +159,15 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
               size="small"
               color="primary"
               onChange={(_, val) => val && onMetricChange(val)}
+              sx={{
+                '& .MuiToggleButton-root': {
+                  px: 1.25,
+                  py: 0.25,
+                  fontSize: '0.72rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                },
+              }}
             >
               <ToggleButton value="risk">Risk</ToggleButton>
               <ToggleButton value="wind">Wind</ToggleButton>
@@ -159,7 +178,7 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
       </Box>
 
       {/* Forecast Scrubber Slider */}
-      <Box sx={{ px: 1 }}>
+      <Box sx={{ px: 3.5, pt: 0.5, pb: 0.5 }}>
         <Slider
           value={forecastHour}
           min={0}
@@ -174,18 +193,42 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
           marks={[
             { value: 0, label: '0h (Departure)' },
             { value: 12, label: '12h' },
-            { value: 24, label: '24h (+1 Day)' },
+            { value: 24, label: '24h (+1d)' },
             { value: 36, label: '36h' },
-            { value: 48, label: '48h (+2 Days)' },
+            { value: 48, label: '48h (+2d)' },
           ]}
+          sx={{
+            py: 1,
+            '& .MuiSlider-markLabel[data-index="0"]': {
+              transform: 'translateX(0)',
+            },
+            '& .MuiSlider-markLabel[data-index="4"]': {
+              transform: 'translateX(-100%)',
+            },
+            '& .MuiSlider-markLabel': {
+              fontSize: '0.72rem',
+              color: 'text.secondary',
+              fontWeight: 500,
+              mt: 0.5,
+            },
+            '& .MuiSlider-mark': {
+              height: 4,
+              width: 4,
+              borderRadius: '50%',
+              bgcolor: 'rgba(255, 255, 255, 0.35)',
+            },
+            '& .MuiSlider-markActive': {
+              bgcolor: 'background.paper',
+            },
+          }}
         />
       </Box>
 
       {/* Heatmap Opacity Scrubber */}
       {showHeatmap && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 1 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ minWidth: 80 }}>
-            Layer Opacity:
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 3.5, pt: 0.25 }}>
+          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+            Heatmap Opacity:
           </Typography>
           <Slider
             size="small"
@@ -196,9 +239,9 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
             valueLabelDisplay="auto"
             valueLabelFormat={(val) => `${Math.round(val * 100)}%`}
             onChange={(_, val) => onOpacityChange(val as number)}
-            sx={{ maxWidth: 200 }}
+            sx={{ width: 140 }}
           />
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" color="text.secondary" sx={{ minWidth: 32, fontVariantNumeric: 'tabular-nums' }}>
             {Math.round(heatmapOpacity * 100)}%
           </Typography>
         </Box>
