@@ -1,6 +1,16 @@
 import { GeocodeResultItem, TripPlanResponse } from '../types/trip';
 
-const API_BASE = '/api';
+// Robust normalization for local development and production deployments (Render, Vercel, Netlify)
+const normalizeApiBase = (raw?: string): string => {
+  if (!raw || raw === '/api') return '/api';
+  let url = raw.trim();
+  if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+    url = `https://${url}`;
+  }
+  return url.endsWith('/api') ? url : `${url.replace(/\/+$/, '')}/api`;
+};
+
+const API_BASE = normalizeApiBase(import.meta.env.VITE_API_URL);
 
 export interface TripPlanPayload {
   origin: string;
