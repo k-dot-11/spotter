@@ -4,6 +4,13 @@ import { GeocodeResultItem, TripPlanResponse } from '../types/trip';
 const normalizeApiBase = (raw?: string): string => {
   if (!raw || raw === '/api') return '/api';
   let url = raw.trim();
+
+  // If Render injected an internal service name without TLD (e.g. "spotter-backend-7t78")
+  const hostPart = url.replace(/^https?:\/\//, '').split('/')[0];
+  if (hostPart && !hostPart.includes('.') && !hostPart.includes(':') && hostPart !== 'localhost') {
+    url = url.replace(hostPart, `${hostPart}.onrender.com`);
+  }
+
   if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
     url = `https://${url}`;
   }
