@@ -17,6 +17,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StraightenIcon from '@mui/icons-material/Straighten';
 import { geocodeCities } from '../../api/client';
 import { GeocodeResultItem } from '../../types/trip';
+import { toDateTimeLocalValue } from '../../utils/dateTime';
 
 export interface TripFormValues {
   origin: string;
@@ -33,18 +34,20 @@ interface TripFormProps {
 }
 
 export const TripForm: React.FC<TripFormProps> = ({ initialValues, onSubmit, isLoading }) => {
-  // Format current local time for datetime-local input
-  const getNowFormatted = () => {
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    return now.toISOString().slice(0, 16);
-  };
-
   const [origin, setOrigin] = useState<string>(initialValues?.origin ?? 'Chicago, IL');
   const [destination, setDestination] = useState<string>(initialValues?.destination ?? 'Indianapolis, IN');
-  const [departureTime, setDepartureTime] = useState<string>(initialValues?.departureTime ?? getNowFormatted());
+  const [departureTime, setDepartureTime] = useState<string>(() =>
+    toDateTimeLocalValue(initialValues?.departureTime)
+  );
   const [weightLbs, setWeightLbs] = useState<number>(initialValues?.weightLbs ?? 35000);
   const [intervalMiles, setIntervalMiles] = useState<number>(initialValues?.intervalMiles ?? 25);
+
+  // Sync state if initialValues changes (e.g. navigating back from cockpit to landing)
+  React.useEffect(() => {
+    if (initialValues?.departureTime) {
+      setDepartureTime(toDateTimeLocalValue(initialValues.departureTime));
+    }
+  }, [initialValues?.departureTime]);
 
   // Autocomplete suggestions
   const [originOptions, setOriginOptions] = useState<string[]>([]);

@@ -9,6 +9,7 @@ import { RouteMap } from './components/Map/RouteMap';
 import { HeatmapMetric } from './components/Map/TimelineSlider';
 import { planTrip } from './api/client';
 import { TripPlanResponse } from './types/trip';
+import { getCurrentLocalDateTimeString } from './utils/dateTime';
 
 export type ViewMode = 'landing' | 'cockpit';
 
@@ -27,7 +28,7 @@ export const App: React.FC = () => {
   const [formValues, setFormValues] = useState<TripFormValues>({
     origin: 'Chicago, IL',
     destination: 'Indianapolis, IN',
-    departureTime: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
+    departureTime: getCurrentLocalDateTimeString(),
     weightLbs: 35000,
     intervalMiles: 25,
   });
@@ -66,6 +67,11 @@ export const App: React.FC = () => {
   };
 
   const handleBackToLanding = () => {
+    // Refresh departure time to the current local datetime when returning to landing page
+    setFormValues((prev) => ({
+      ...prev,
+      departureTime: getCurrentLocalDateTimeString(),
+    }));
     setViewMode('landing');
     if (window.location.hash) {
       window.history.pushState({ view: 'landing' }, '', window.location.pathname);

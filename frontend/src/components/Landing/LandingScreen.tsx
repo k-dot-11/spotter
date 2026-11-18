@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Box, Container, Paper, Typography } from '@mui/material';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { TripForm, TripFormValues } from '../Sidebar/TripForm';
+import { toDateTimeLocalValue } from '../../utils/dateTime';
 
 interface LandingScreenProps {
   initialValues?: Partial<TripFormValues>;
@@ -14,6 +15,12 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
   onSubmit,
   isLoading,
 }) => {
+  // Always ensure landing form defaults to the fresh current local datetime
+  const landingValues = useMemo(() => ({
+    ...initialValues,
+    departureTime: toDateTimeLocalValue(initialValues?.departureTime),
+  }), [initialValues]);
+
   return (
     <Box
       sx={{
@@ -39,7 +46,6 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
           <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 500 }}>
             Weather-Aware Heavy Vehicle Routing & Risk Analysis
           </Typography>
-
         </Box>
 
         {/* Centralized Form Box */}
@@ -55,7 +61,7 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
             Plan a Route
           </Typography>
           <TripForm
-            initialValues={initialValues}
+            initialValues={landingValues}
             onSubmit={onSubmit}
             isLoading={isLoading}
           />
