@@ -38,6 +38,8 @@ export const App: React.FC = () => {
     setFormValues(params);
     setViewMode('cockpit');
     setIsLoading(true);
+    setTripData(null); // Clear older paths, heatmap, and cards from the map during load
+    setSelectedRouteId('');
     setErrorMessage(null);
 
     // Sync with browser history for natural back-button support
@@ -168,6 +170,7 @@ export const App: React.FC = () => {
                 onToggleHeatmap={setShowHeatmap}
                 heatmapOpacity={heatmapOpacity}
                 onOpacityChange={setHeatmapOpacity}
+                isLoading={isLoading}
               />
             </Box>
           </Box>

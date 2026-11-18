@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Box } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { RouteSummary, CorridorHeatmapTimeline } from '../../types/trip';
 import { RoutePolyline } from './RoutePolyline';
 import { CheckpointMarkers } from './CheckpointMarkers';
@@ -23,6 +23,7 @@ interface RouteMapProps {
   onToggleHeatmap: (show: boolean) => void;
   heatmapOpacity: number;
   onOpacityChange: (opacity: number) => void;
+  isLoading?: boolean;
 }
 
 // Adjusts map bounds ONCE when a new trip is loaded, preventing tile cancellation / black box tearing
@@ -31,7 +32,10 @@ const MapBoundsAdjuster: React.FC<{ routes: RouteSummary[] }> = ({ routes }) => 
   const lastKeyRef = useRef<string>('');
 
   useEffect(() => {
-    if (!routes || routes.length === 0) return;
+    if (!routes || routes.length === 0) {
+      lastKeyRef.current = '';
+      return;
+    }
 
     // Unique signature for this route set (only refit when actual routes change, NOT on route selection/hover/slider)
     const currentKey = routes.map((r) => r.route_id).join('|');
@@ -97,6 +101,7 @@ export const RouteMap: React.FC<RouteMapProps> = React.memo(({
   onToggleHeatmap,
   heatmapOpacity,
   onOpacityChange,
+  isLoading = false,
 }) => {
   const selectedRoute = useMemo(
     () => routes.find((r) => r.route_id === selectedRouteId) || routes[0],
@@ -210,6 +215,32 @@ export const RouteMap: React.FC<RouteMapProps> = React.memo(({
           heatmapOpacity={heatmapOpacity}
           onOpacityChange={onOpacityChange}
         />
+      )}
+
+      {/* Loading Overlay when calculating new corridors */}
+      {isLoading && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            bgcolor: 'rgba(15, 15, 15, 0.45)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 1100,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+          }}
+        >
+          <CircularProgress color="primary" size={44} thickness={4} />
+          <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600, letterSpacing: 0.3 }}>
+            Analyzing Weather Corridors & Optimizing Routes...
+          </Typography>
+        </Box>
       )}
     </Box>
   );
