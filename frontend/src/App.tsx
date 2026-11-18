@@ -151,7 +151,7 @@ export const App: React.FC = () => {
                 height: '100%',
                 position: 'relative',
                 overflow: 'hidden',
-                bgcolor: '#e0e0e0',
+                bgcolor: 'background.default',
               }}
             >
               <RouteMap

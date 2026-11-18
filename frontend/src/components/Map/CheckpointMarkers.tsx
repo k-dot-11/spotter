@@ -69,21 +69,21 @@ export const CheckpointMarkers: React.FC<CheckpointMarkersProps> = ({ checkpoint
                 {/* Weather Breakdown */}
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 1 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#666' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#94a3b8' }}>
                       <AirIcon fontSize="inherit" color="action" /> Wind Speed:
                     </span>
                     <strong>{cp.weather.wind_mph.toFixed(1)} mph</strong>
                   </Box>
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#666' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#94a3b8' }}>
                       <WaterDropIcon fontSize="inherit" color="action" /> Rain Rate:
                     </span>
                     <strong>{cp.weather.rain_in_per_hr.toFixed(2)} in/hr</strong>
                   </Box>
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#666' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#94a3b8' }}>
                       <AcUnitIcon fontSize="inherit" color="action" /> Snow Rate:
                     </span>
                     <strong>{cp.weather.snow_in_per_hr.toFixed(2)} in/hr</strong>

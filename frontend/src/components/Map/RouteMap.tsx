@@ -141,12 +141,20 @@ export const RouteMap: React.FC<RouteMapProps> = React.memo(({
         center={defaultCenter}
         zoom={7}
         scrollWheelZoom={true}
-        style={{ width: '100%', height: '100%', background: '#e0e0e0' }}
+        style={{ width: '100%', height: '100%', background: '#0F0F0F' }}
       >
-        {/* Esri World Street Map (Clean, Free, Zero API Keys, Standard Map Style) */}
+        {/* Esri World Dark Gray Canvas (Matches #0F0F0F / #232D3F Dark Theme) */}
         <TileLayer
-          attribution='Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS'
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+          attribution='Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+          maxZoom={16}
+          keepBuffer={6}
+          updateWhenZooming={false}
+          updateWhenIdle={false}
+        />
+        <TileLayer
+          attribution=""
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
           maxZoom={16}
           keepBuffer={6}
           updateWhenZooming={false}

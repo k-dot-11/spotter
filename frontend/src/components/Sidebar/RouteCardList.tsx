@@ -117,11 +117,11 @@ export const RouteCardList: React.FC<RouteCardListProps> = ({
                     height: 6,
                     borderRadius: 1,
                     overflow: 'hidden',
-                    bgcolor: 'grey.200',
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
                     mb: 1.5,
                   }}
                 >
-                  {lowPct > 0 && <Box sx={{ width: `${lowPct}%`, bgcolor: '#2e7d32' }} />}
+                  {lowPct > 0 && <Box sx={{ width: `${lowPct}%`, bgcolor: '#008170' }} />}
                   {modPct > 0 && <Box sx={{ width: `${modPct}%`, bgcolor: '#ed6c02' }} />}
                   {highPct > 0 && <Box sx={{ width: `${highPct}%`, bgcolor: '#ef6c00' }} />}
                   {sevPct > 0 && <Box sx={{ width: `${sevPct}%`, bgcolor: '#d32f2f' }} />}
@@ -155,9 +155,9 @@ export const RouteCardList: React.FC<RouteCardListProps> = ({
               {/* Recommendation Reasoning / Hazard Note */}
               <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 {isRecommended ? (
-                  <span style={{ color: '#2e7d32', fontWeight: 500 }}>★ {route.recommendation_reason}</span>
+                  <span style={{ color: '#00b89f', fontWeight: 600 }}>★ {route.recommendation_reason}</span>
                 ) : hasNoTravel ? (
-                  <span style={{ color: '#d32f2f', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: 4 }}>
                     <WarningAmberIcon fontSize="small" />
                     {route.recommendation_reason}
                   </span>

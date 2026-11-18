@@ -2,10 +2,10 @@ import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
 
 const RISK_LEVELS = [
-  { label: 'Low', color: '#2e7d32', desc: '<25 mph wind / <0.10" rain' },
-  { label: 'Moderate', color: '#ed6c02', desc: '25-34 mph wind / 0.10-0.25" rain' },
-  { label: 'High', color: '#ef6c00', desc: '35-44 mph wind / 0.25-0.50" rain' },
-  { label: 'Severe', color: '#d32f2f', desc: '45-54 mph wind / 0.50-1.00" rain' },
+  { label: 'Low', color: '#008170', desc: '<25 mph wind / <0.10" rain' },
+  { label: 'Moderate', color: '#f59e0b', desc: '25-34 mph wind / 0.10-0.25" rain' },
+  { label: 'High', color: '#f97316', desc: '35-44 mph wind / 0.25-0.50" rain' },
+  { label: 'Severe', color: '#ef4444', desc: '45-54 mph wind / 0.50-1.00" rain' },
   { label: 'No Travel', color: '#7f1d1d', desc: '≥55 mph wind / >1.00" rain' },
 ];
 

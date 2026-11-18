@@ -44,7 +44,7 @@ export const HeatmapLayer: React.FC<HeatmapLayerProps> = ({
     }
     // Default: Overall Risk Gradient
     return {
-      0.2: '#22c55e', // Green (Low Risk 1)
+      0.2: '#008170', // Emerald Teal (Low Risk 1)
       0.4: '#eab308', // Yellow (Moderate Risk 2)
       0.6: '#f97316', // Orange (High Risk 3)
       0.8: '#ef4444', // Red (Severe Risk 4)
