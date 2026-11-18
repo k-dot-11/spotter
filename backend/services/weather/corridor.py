@@ -43,6 +43,8 @@ def compile_corridor_heatmap_timeline(
         risk_timeline: list[int] = []
         wind_timeline: list[float] = []
         precip_timeline: list[float] = []
+        rain_timeline: list[float] = []
+        snow_timeline: list[float] = []
 
         for h in range(max_forecast_hours + 1):
             target_t = start_utc + timedelta(hours=h)
@@ -66,6 +68,8 @@ def compile_corridor_heatmap_timeline(
             risk_timeline.append(risk_result.risk_score)
             wind_timeline.append(wind)
             precip_timeline.append(rain + snow)
+            rain_timeline.append(rain)
+            snow_timeline.append(snow)
 
         heatmap_points.append(
             CorridorHeatmapPoint(
@@ -74,6 +78,8 @@ def compile_corridor_heatmap_timeline(
                 risk_timeline=risk_timeline,
                 wind_timeline=wind_timeline,
                 precip_timeline=precip_timeline,
+                rain_timeline=rain_timeline,
+                snow_timeline=snow_timeline,
             )
         )
 

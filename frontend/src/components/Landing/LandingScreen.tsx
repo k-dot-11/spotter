@@ -1,8 +1,6 @@
 import React from 'react';
-import { Box, Container, Paper, Typography, Chip } from '@mui/material';
+import { Box, Container, Paper, Typography } from '@mui/material';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import CloudIcon from '@mui/icons-material/Cloud';
-import ShieldIcon from '@mui/icons-material/Shield';
 import { TripForm, TripFormValues } from '../Sidebar/TripForm';
 
 interface LandingScreenProps {
@@ -42,20 +40,6 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
             Weather-Aware Heavy Vehicle Routing & Risk Analysis
           </Typography>
 
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 1.5 }}>
-            <Chip
-              icon={<ShieldIcon fontSize="small" />}
-              label="Safety-First Optimization"
-              size="small"
-              variant="outlined"
-            />
-            <Chip
-              icon={<CloudIcon fontSize="small" />}
-              label="48-Hour Weather Forecasts"
-              size="small"
-              variant="outlined"
-            />
-          </Box>
         </Box>
 
         {/* Centralized Form Box */}

@@ -100,6 +100,8 @@ class TestOpenMeteoWeatherService(unittest.TestCase):
         self.assertEqual(len(point.risk_timeline), 49)
         self.assertEqual(len(point.wind_timeline), 49)
         self.assertEqual(len(point.precip_timeline), 49)
+        self.assertEqual(len(point.rain_timeline), 49)
+        self.assertEqual(len(point.snow_timeline), 49)
         # Verify values are valid risk scores between 1 and 5
         for score in point.risk_timeline:
             self.assertIn(score, [1, 2, 3, 4, 5])

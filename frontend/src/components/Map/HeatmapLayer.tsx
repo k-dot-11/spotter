@@ -11,7 +11,7 @@ import 'leaflet.heat';
 interface HeatmapLayerProps {
   points: [number, number, number][]; // [lat, lon, intensity]
   opacity?: number;
-  metric?: 'risk' | 'wind' | 'precip';
+  metric?: 'risk' | 'wind' | 'rain' | 'snow' | 'precip';
 }
 
 export const HeatmapLayer: React.FC<HeatmapLayerProps> = ({
@@ -33,12 +33,30 @@ export const HeatmapLayer: React.FC<HeatmapLayerProps> = ({
         1.0: '#7f1d1d', // No Travel (≥55 mph)
       };
     }
+    if (metric === 'rain') {
+      return {
+        0.15: '#93c5fd', // Light rain (<0.10 in/hr)
+        0.35: '#3b82f6', // Moderate rain (0.10-0.25 in/hr)
+        0.60: '#f97316', // Heavy rain (0.25-0.50 in/hr)
+        0.85: '#ef4444', // Severe downpour (0.50-1.00 in/hr)
+        1.0: '#7f1d1d',  // Flash flood / No Travel (≥1.00 in/hr)
+      };
+    }
+    if (metric === 'snow') {
+      return {
+        0.15: '#cffafe', // Light flurries (<0.5 in/hr)
+        0.35: '#818cf8', // Moderate snow (0.5-1.0 in/hr)
+        0.60: '#a855f7', // Heavy snow (1.0-2.0 in/hr)
+        0.85: '#ec4899', // Severe blizzard (2.0-3.0 in/hr)
+        1.0: '#ffffff',  // Whiteout / No Travel (≥3.0 in/hr)
+      };
+    }
     if (metric === 'precip') {
       return {
-        0.2: '#93c5fd', // Light rain
+        0.2: '#93c5fd', // Light precip
         0.4: '#3b82f6', // Moderate
         0.6: '#6366f1', // Heavy rain / snow
-        0.8: '#a855f7', // Severe snow storm
+        0.8: '#a855f7', // Severe storm
         1.0: '#701a75', // Extreme No Travel
       };
     }
@@ -54,6 +72,8 @@ export const HeatmapLayer: React.FC<HeatmapLayerProps> = ({
 
   const getMaxIntensity = () => {
     if (metric === 'wind') return 65.0; // mph
+    if (metric === 'rain') return 1.25; // in/hr
+    if (metric === 'snow') return 3.5;  // in/hr
     if (metric === 'precip') return 2.5; // in/hr
     return 5.0; // Risk levels 1..5
   };

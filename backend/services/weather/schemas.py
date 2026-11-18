@@ -44,7 +44,9 @@ class CorridorHeatmapPoint:
     lon: float
     risk_timeline: list[int] = field(default_factory=list)  # Risk level scores 1..5 for h=0..48
     wind_timeline: list[float] = field(default_factory=list)  # Wind mph for h=0..48
-    precip_timeline: list[float] = field(default_factory=list)  # Rain+Snow in/hr for h=0..48
+    precip_timeline: list[float] = field(default_factory=list)  # Total Rain+Snow in/hr for h=0..48
+    rain_timeline: list[float] = field(default_factory=list)  # Rain in/hr for h=0..48
+    snow_timeline: list[float] = field(default_factory=list)  # Snow in/hr for h=0..48
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -53,6 +55,8 @@ class CorridorHeatmapPoint:
             "risk_timeline": self.risk_timeline,
             "wind_timeline": [round(w, 1) for w in self.wind_timeline],
             "precip_timeline": [round(p, 2) for p in self.precip_timeline],
+            "rain_timeline": [round(r, 2) for r in self.rain_timeline],
+            "snow_timeline": [round(s, 2) for s in self.snow_timeline],
         }
 
 

@@ -17,7 +17,7 @@ import FastRewindIcon from '@mui/icons-material/FastRewind';
 import FastForwardIcon from '@mui/icons-material/FastForward';
 import LayersIcon from '@mui/icons-material/Layers';
 
-export type HeatmapMetric = 'risk' | 'wind' | 'precip';
+export type HeatmapMetric = 'risk' | 'wind' | 'rain' | 'snow';
 
 interface TimelineSliderProps {
   forecastHour: number;
@@ -171,7 +171,8 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({
             >
               <ToggleButton value="risk">Risk</ToggleButton>
               <ToggleButton value="wind">Wind</ToggleButton>
-              <ToggleButton value="precip">Precip</ToggleButton>
+              <ToggleButton value="rain">Rain</ToggleButton>
+              <ToggleButton value="snow">Snow</ToggleButton>
             </ToggleButtonGroup>
           )}
         </Box>

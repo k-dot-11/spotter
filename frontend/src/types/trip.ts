@@ -60,7 +60,9 @@ export interface CorridorHeatmapPoint {
   lon: number;
   risk_timeline: number[];    // 0..48 hours (risk scores 1..5)
   wind_timeline: number[];    // 0..48 hours (mph)
-  precip_timeline: number[];  // 0..48 hours (in/hr)
+  precip_timeline: number[];  // 0..48 hours (total precip in/hr)
+  rain_timeline?: number[];   // 0..48 hours (rain in/hr)
+  snow_timeline?: number[];   // 0..48 hours (snow in/hr)
 }
 
 export interface CorridorHeatmapTimeline {

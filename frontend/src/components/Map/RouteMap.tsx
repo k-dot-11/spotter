@@ -122,8 +122,10 @@ export const RouteMap: React.FC<RouteMapProps> = React.memo(({
       let intensity = 1.0;
       if (heatmapMetric === 'wind') {
         intensity = p.wind_timeline[forecastHour] ?? 0.0;
-      } else if (heatmapMetric === 'precip') {
-        intensity = p.precip_timeline[forecastHour] ?? 0.0;
+      } else if (heatmapMetric === 'rain') {
+        intensity = p.rain_timeline?.[forecastHour] ?? p.precip_timeline?.[forecastHour] ?? 0.0;
+      } else if (heatmapMetric === 'snow') {
+        intensity = p.snow_timeline?.[forecastHour] ?? 0.0;
       } else {
         // 'risk' level 1..5
         intensity = p.risk_timeline[forecastHour] ?? 1.0;
